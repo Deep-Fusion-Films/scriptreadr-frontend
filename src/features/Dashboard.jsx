@@ -1,0 +1,713 @@
+import { useState, useRef, useEffect } from "react";
+import {  useNavigate } from "react-router-dom";
+
+import { FiSave, FiMusic } from "react-icons/fi";
+import { FiUpload } from "react-icons/fi";
+import { FaFileCirclePlus } from "react-icons/fa6";
+
+import SideBar from "./SideBar";
+import Modal from "./Modal";
+import AudioPlayer from "./AudioPlayer";
+import PreviewButton from "./PreviewButton";
+import SpeakerListPreviewButton from "./SpeakerListPreviewButton";
+import FormatingScriptModal from "./FormatingScriptModal";
+import WelcomeScreen from "./WelcomeScreen";
+import ErrorPopUp from "./ErrorPopUp";
+import { redirect } from "react-router-dom";
+import { checkAuthToken } from "../util";
+import { useToken } from "../store/AuthContext";
+import { useSubscription } from "../store/SubcriptionContext";
+
+export default function Dashboard() {
+  const { setToken } = useToken();
+  const { refetch } = useSubscription();
+
+  const navigate = useNavigate();
+
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  const [text, setText] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const [abortController, setAbortController] = useState(null);
+
+  //check if audio file is loading
+  const [isLoading, setIsLoading] = useState(false);
+
+  //display when script is formating
+  const [isFormating, setIsFormating] = useState(false);
+
+  //get available voices
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState("");
+
+  //state for playing, pausing and stopping the audio
+  const [audioUrl, setAudioUrl] = useState(null);
+
+  const [speakers, setSpeakers] = useState([]);
+  const [speakerVoices, setSpeakerVoices] = useState({});
+
+  const [progress, setProgress] = useState(0);
+
+  const [error, setError] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  //handle upload files
+  const fileInputRef = useRef(null);
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (event) => {
+    setIsFormating(true);
+
+    const file = event.target.files[0];
+
+    if (!file) {
+      setIsFormating(false)
+      return;
+    }
+    
+    event.target.value = "";
+    setFileName(file.name)
+
+      const token = await checkAuthToken();
+      if (!token) {
+        setToken(null);
+        navigate("/signin");
+        setIsFormating(false);
+        return
+      }
+
+      setToken(token);
+
+      //check subscription and quotas before upload
+      try {
+        const subscription = await fetch(
+          `${import.meta.env.VITE_LOCAL}/file/subscription_status/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const status = await subscription.json();
+
+        if (!subscription.ok) {
+          setError(status.error);
+          setIsFormating(false);
+          setShowErrorModal(true);
+          return;
+        }
+      } catch (err) {
+        setError("Could not check your subscription status, please try again.");
+        return
+      }
+
+      //read the file or upload it
+      const formData = new FormData();
+      formData.append("file", file);
+      const controller = new AbortController();
+      setAbortController(controller);
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_LOCAL}/file/upload/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+            signal: controller.signal,
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error);
+          setIsFormating(false);
+          setShowErrorModal(true);
+          console.error(data);
+          return;
+        }
+        localStorage.setItem("task_id", data.task_id);
+        startPolling(data.task_id);
+      } catch (error) {
+        console.log(error);
+        setError(
+          "We couldn't upload your file. Please ensure you have an active subscription and try again."
+        );
+        setShowErrorModal(true);
+        //load jsx component
+      } finally {
+          setIsFormating(false);
+
+      }
+    }
+
+  //polling task function
+  const startPolling = (taskId) => {
+    const intervalId = setInterval(async () => {
+      try {
+        const token = await checkAuthToken();
+        if (!token) {
+          clearInterval(intervalId);
+          return redirect("/signin");
+        }
+
+        const controller = new AbortController();
+        setAbortController(controller);
+
+        const response = await fetch(
+          `${import.meta.env.VITE_LOCAL}/file/task-status/${taskId}/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            signal: controller.signal,
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          clearInterval(intervalId);
+          localStorage.removeItem("task_id");
+          setIsFormating(false);
+          setError(data.error);
+          setShowErrorModal(true);
+          return;
+        }
+
+        if (data.status === "PROGRESS" && typeof data.progress === "number") {
+          setProgress(data.progress);
+        }
+
+        if (data.status === "FAILURE" || data.error) {
+          clearInterval(intervalId);
+          localStorage.removeItem("task_id");
+          console.error("task error:", data.error);
+          setIsFormating(false);
+          setError(
+            data.error || "Error formatting Script, please try again later"
+          );
+          setShowErrorModal(true);
+          return;
+        }
+
+        if (data.status === "success") {
+          console.log(data.status);
+          clearInterval(intervalId);
+          localStorage.removeItem("task_id"); // clean up
+          const res = await fetch(
+            `${import.meta.env.VITE_LOCAL}/file/script/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const info = await res.json();
+
+          if (!res.ok) {
+            setIsFormating(false);
+            setError(info.error);
+            setShowErrorModal(true);
+            console.error("task error:", info.error);
+            return;
+          }
+
+          setText(info.script);
+          setSpeakers(info.speakers); // update UI
+          setIsFormating(false);
+          refetch();
+          console.log("success data", info);
+        }
+      } catch (error) {
+        clearInterval(intervalId);
+        localStorage.removeItem("task_id");
+        setError("Could not format your script, please refresh or try again.");
+        setShowErrorModal(true);
+
+        console.error("Error during polling:", error);
+      }
+    }, 3000); // check every 3 seconds
+  };
+
+  //fetch subscription data on mount
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  //fetchScript
+  useEffect(() => {
+    const fetchScript = async () => {
+      try {
+        const token = await checkAuthToken();
+        if (!token) {
+          setToken(null);
+          navigate("/signin");
+          throw new Error("No valid access token");
+        }
+
+        setToken(token);
+        const response = await fetch(
+          `${import.meta.env.VITE_LOCAL}/file/script/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error);
+        }
+
+        console.log("success data", data);
+        setText(data.script);
+        setSpeakers(data.speakers);
+      } catch (error) {
+        console.error("Error fetching script:", error);
+      }
+    };
+
+    const existingTaskId = localStorage.getItem("task_id");
+    if (existingTaskId) {
+      setIsFormating(true);
+      startPolling(existingTaskId);
+    } else {
+      fetchScript();
+    }
+  }, []);
+
+  //get available voices
+  useEffect(() => {
+    const fetchVoices = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_LOCAL}/audio/tts/`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error("Failed to load voices");
+        setVoices(data);
+      } catch (err) {
+        console.error("Error loading voices", err);
+      }
+    };
+
+    fetchVoices();
+  }, []);
+
+  //handle play script
+  const handlePlayScript = async () => {
+    if (isLoading) return;
+
+    const token = await checkAuthToken();
+    if (!token) {
+      setToken(null);
+      navigate("/signin");
+      throw new Error("No valid access token");
+    }
+
+    setToken(token);
+
+    //stop play script request
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    //check if there is no text
+    if (!text) {
+      setError("You need to upload a script to generate audio");
+      setShowErrorModal(true);
+      return;
+    }
+
+    setIsLoading(true); //start loading
+    //check subscription and quotas before upload
+    try {
+      const subscription = await fetch(
+        `${import.meta.env.VITE_LOCAL}/audio/subscription_audio/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const status = await subscription.json();
+
+      if (!subscription.ok) {
+        setError(status.error);
+        setIsLoading(false);
+        setShowErrorModal(true);
+        console.error(status);
+        return;
+      }
+    } catch (err) {
+      setError("Could not check your subscription status, please try again.");
+      return
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          text,
+          voice_id: selectedVoice,
+          speaker_voices: speakerVoices,
+        }),
+        signal: controller.signal,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error);
+        setIsLoading(false);
+        setShowErrorModal(true);
+        setAbortController(null);
+        console.log(data.error);
+        return;
+      }
+
+      localStorage.setItem("audio_id", data.task_id);
+      polling(data.task_id);
+    } catch (err) {
+      setError(
+        "Our System encountered an error while processing your request, please try again later"
+      );
+      setIsLoading(false);
+      setShowErrorModal(true);
+      console.log(err);
+    } finally {
+      setAbortController(null);
+    }
+  };
+
+  //next thing is to handle polling logic here
+  const polling = (audio_id) => {
+    const intervalid = setInterval(async () => {
+      try {
+        const token = await checkAuthToken();
+        if (!token) {
+          clearInterval(intervalid);
+          return redirect("/signin");
+        }
+
+        const controller = new AbortController();
+        setAbortController(controller);
+
+        const response = await fetch(
+          `${import.meta.env.VITE_LOCAL}/audio/task-status/${audio_id}/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            signal: controller.signal,
+          }
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          clearInterval(intervalid);
+          localStorage.removeItem("audio_id");
+          setError(data.error);
+          setShowErrorModal(true);
+          return;
+        }
+
+        if (data.status === "PROGRESS" && typeof data.progress === "number") {
+          setProgress(data.progress);
+        }
+
+        if (data.status === "FAILURE" || data.error) {
+          console.log("this is audio error:", data.error);
+          localStorage.removeItem("audio_id");
+          clearInterval(intervalid);
+          setIsLoading(false);
+          setError(data.error || "audio generation failed, please try again");
+          setShowErrorModal(true);
+          return;
+        }
+
+        if (data.status === "success") {
+          console.log(data.status);
+          clearInterval(intervalid);
+          localStorage.removeItem("audio_id");
+
+          const res = await fetch(
+            `${import.meta.env.VITE_LOCAL}/audio/processed_audio/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const info = await res.json();
+          if (!res.ok) {
+            setError(info.error || "audio generation failed, please try again");
+            setIsLoading(false);
+            setShowErrorModal(true);
+            return;
+          }
+          const signedUrl = info.audio_url;
+
+          setAudioUrl(signedUrl);
+          setIsLoading(false);
+          refetch();
+        }
+      } catch (error) {
+        clearInterval(intervalid);
+        localStorage.removeItem("audio_id");
+        setIsLoading(false);
+        setError(error || "An unexpected error occured during polling");
+        setShowErrorModal(true);
+      }
+    }, 3000);
+  };
+
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const token = await checkAuthToken();
+        if (!token) {
+          setToken(null);
+          navigate("/signin");
+        }
+
+        setToken(token);
+
+        const response = await fetch(
+          `${import.meta.env.VITE_LOCAL}/audio/processed_audio/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const signedUrl = data.audio_url;
+          setAudioUrl(signedUrl);
+        } else {
+          console.error("Failed to fetch script", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching script:", error);
+      }
+    };
+
+    const existingTaskId = localStorage.getItem("audio_id");
+    if (existingTaskId) {
+      setIsLoading(true); // show loading UI
+      polling(existingTaskId);
+    } else {
+      fetchAudio();
+    }
+  }, []);
+
+  //handle savescript as file and audio
+  const handleSaveScript = async (type) => {
+    setOpen(false);
+
+    if (type === "file") {
+      console.log("File saved");
+      // Add your file-saving logic here if needed.
+    } else if (type === "audio") {
+      if (audioUrl) {
+        try {
+          // Fetch the audio data as a Blob
+          const response = await fetch(audioUrl);
+          if (!response.ok) {
+            throw new Error("Failed to fetch audio file.");
+          }
+          const blob = await response.blob();
+
+          // Create downloadable URL from Blob
+          const url = URL.createObjectURL(blob);
+
+          // Create anchor element for download
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "script.mp3";
+          document.body.appendChild(a);
+
+          // Programmatically trigger download
+          a.click();
+
+          // Clean up
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          console.log("Audio downloaded successfully");
+        } catch (error) {
+          console.error("Error downloading audio:", error);
+          alert("An error occurred while downloading the audio.");
+        }
+      } else {
+        alert("No audio available to download yet.");
+        console.warn("Attempted to download, but no audio is ready.");
+      }
+    }
+  };
+
+  return (
+    <>
+      <div className="flex flex-col">
+        <ErrorPopUp
+          error={error}
+          setShowErrorModal={setShowErrorModal}
+          showErrorModal={showErrorModal}
+        />
+
+        <WelcomeScreen
+          showWelcome={showWelcome}
+          setShowWelcome={setShowWelcome}
+        />
+
+        <div className="flex flex-1">
+          <SideBar />
+
+          {/* Main Content Area */}
+
+          {/*Modal which contains the cancel button  */}
+          <Modal
+            progress={progress}
+            isLoading={isLoading}
+            abortController={abortController}
+          />
+          <FormatingScriptModal
+            progress={progress}
+            isFormating={isFormating}
+            setIsFormating={setIsFormating}
+            abortController={abortController}
+          />
+
+          <main className="flex-1 p-6 bg-white">
+            <div className="flex flex-col lg:flex-row justify-between gap-4">
+              <div
+                placeholder="Type or paste your script here..."
+                className="flex items-center justify-center shadow-sm lg:w-3/4 h-[70vh] border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <div className="flex flex-col items-center justify-center gap-2">
+                  {/* handle fil change, it's not shown */}
+                  <input
+                    type="file"
+                    accept=".txt,.pdf,.docx" // adjust based on what you want to allow
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+
+                  {/* upload icon */}
+                  <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
+                  <p>upload your scripts, txt, doc, pdf.</p>
+
+                  {fileName && <p>{fileName}</p>}
+
+                  <button
+                    onClick={handleClick}
+                    className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
+                  >
+                    <FiUpload />
+                    Load Script
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative shadow-sm border border-gray-300 rounded-lg">
+                <p className="bg-[#2E3A87] text-white p-4 rounded-lg">Audio:</p>
+                <div className="flex rounded-lg gap-4 p-4 align-center">
+                  <AudioPlayer audioUrl={audioUrl} />
+
+                  <button
+                    onClick={() => handleSaveScript("audio")}
+                    className="whitespace-nowrap inline-flex items-center rounded-lg shadow-sm gap-2 py-1 px-3 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
+                  >
+                    <FiSave />
+                    Save audio
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <p className="bg-[#2E3A87] rounded-lg text-white p-4">
+                    Speaker List:
+                  </p>
+                  <div className=" space-y-4 p-4 max-h-75 overflow-y-auto">
+                    {!text && (
+                      <p className="text-gray-400 lg:absolute lg:top-4/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 text-center">
+                        Speakers and voice selection will appear here once you
+                        upload a file
+                      </p>
+                    )}
+                    {speakers?.map((speaker) => (
+                      <div key={speaker} className="flex items-end space-x-4">
+                        <div className="flex flex-col">
+                          <p className="font-semibold mb-1">{speaker}</p>
+
+                          <select
+                            className="w-full max-w-xs py-1 px-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
+                            value={speakerVoices[speaker] || ""}
+                            onChange={(e) =>
+                              setSpeakerVoices((prev) => ({
+                                ...prev,
+                                [speaker]: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="">Select Voice</option>
+                            {voices.map((voice) => (
+                              <option key={voice.id} value={voice.id}>
+                                {voice.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <SpeakerListPreviewButton
+                          speaker={speaker}
+                          speakerVoices={speakerVoices}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex rounded-lg gap-4 lg:absolute bottom-0 left-0 border p-4  bg-[#2E3A87] text-white w-full">
+                  <button
+                    onClick={handlePlayScript}
+                    className="flex rounded-lg cursor-pointer border border-[#5C6BC0] items-center gap-2 py-1 px-4 py-2 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
+                  >
+                    Generate Audio
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </>
+  );
+}
