@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { FiSave, FiMusic } from "react-icons/fi";
 import { FiUpload } from "react-icons/fi";
@@ -51,7 +51,11 @@ export default function Dashboard() {
   const [progress, setProgress] = useState(0);
 
   const [error, setError] = useState("");
+
   const [showErrorModal, setShowErrorModal] = useState(false);
+
+  //we use this state to temporarily hide the formatingScriptModal, when canceling the formating fails
+  const [hide, setHide] = useState(true);
 
   //handle upload files
   const fileInputRef = useRef(null);
@@ -65,90 +69,99 @@ export default function Dashboard() {
     const file = event.target.files[0];
 
     if (!file) {
-      setIsFormating(false)
+      setIsFormating(false);
       return;
     }
-    
+
     event.target.value = "";
-    setFileName(file.name)
+    setFileName(file.name);
 
-      const token = await checkAuthToken();
-      if (!token) {
-        setToken(null);
-        navigate("/signin");
-        setIsFormating(false);
-        return
-      }
-
-      setToken(token);
-
-      //check subscription and quotas before upload
-      try {
-        const subscription = await fetch(
-          `${import.meta.env.VITE_LOCAL}/file/subscription_status/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const status = await subscription.json();
-
-        if (!subscription.ok) {
-          setError(status.error);
-          setIsFormating(false);
-          setShowErrorModal(true);
-          return;
-        }
-      } catch (err) {
-        setError("Could not check your subscription status, please try again.");
-        return
-      }
-
-      //read the file or upload it
-      const formData = new FormData();
-      formData.append("file", file);
-      const controller = new AbortController();
-      setAbortController(controller);
-
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_LOCAL}/file/upload/`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-            signal: controller.signal,
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          setError(data.error);
-          setIsFormating(false);
-          setShowErrorModal(true);
-          console.error(data);
-          return;
-        }
-        localStorage.setItem("task_id", data.task_id);
-        startPolling(data.task_id);
-      } catch (error) {
-        console.log(error);
-        setError(
-          "We couldn't upload your file. Please ensure you have an active subscription and try again."
-        );
-        setShowErrorModal(true);
-        //load jsx component
-      } finally {
-          setIsFormating(false);
-
-      }
+    const token = await checkAuthToken();
+    if (!token) {
+      setToken(null);
+      navigate("/signin");
+      setIsFormating(false);
+      return;
     }
+
+    setToken(token);
+
+    // check subscription and quotas before upload
+    try {
+      const subscription = await fetch(
+        `${import.meta.env.VITE_LOCAL}/file/subscription_status/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const status = await subscription.json();
+
+      if (!subscription.ok) {
+        setError(status.error);
+        setIsFormating(false);
+        setShowErrorModal(true);
+        return;
+      }
+    } catch (err) {
+      setError("Could not check your subscription status, please try again.");
+      setIsFormating(false);
+      setShowErrorModal(true);
+      return;
+    }
+
+    //read the file or upload it
+    const formData = new FormData();
+    formData.append("file", file);
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_LOCAL}/file/upload/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+          signal: controller.signal,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error);
+        setIsFormating(false);
+        setShowErrorModal(true);
+        return;
+      }
+      localStorage.setItem("task_id", data.task_id);
+      startPolling(data.task_id);
+    } catch (error) {
+      if (error.name === "AbortError") {
+        setError(
+          "You cancelled formatting your script, please note that if formatting already started your script quota will be deducted"
+        );
+        setIsFormating(false);
+        setShowErrorModal(true);
+        return;
+      }
+
+      setError(
+        "We couldn't upload your file. Please ensure you have an active subscription and try again."
+      );
+      setIsFormating(false);
+      setShowErrorModal(true);
+      return;
+    } finally {
+      setAbortController(null);
+    }
+  };
 
   //polling task function
   const startPolling = (taskId) => {
@@ -157,7 +170,8 @@ export default function Dashboard() {
         const token = await checkAuthToken();
         if (!token) {
           clearInterval(intervalId);
-          return redirect("/signin");
+          navigate("/signin");
+          return;
         }
 
         const controller = new AbortController();
@@ -179,8 +193,8 @@ export default function Dashboard() {
         if (!response.ok) {
           clearInterval(intervalId);
           localStorage.removeItem("task_id");
-          setIsFormating(false);
           setError(data.error);
+          setIsFormating(false);
           setShowErrorModal(true);
           return;
         }
@@ -192,17 +206,16 @@ export default function Dashboard() {
         if (data.status === "FAILURE" || data.error) {
           clearInterval(intervalId);
           localStorage.removeItem("task_id");
-          console.error("task error:", data.error);
-          setIsFormating(false);
           setError(
             data.error || "Error formatting Script, please try again later"
           );
+          setIsFormating(false);
+          setProgress(0);
           setShowErrorModal(true);
           return;
         }
 
         if (data.status === "success") {
-          console.log(data.status);
           clearInterval(intervalId);
           localStorage.removeItem("task_id"); // clean up
           const res = await fetch(
@@ -218,26 +231,40 @@ export default function Dashboard() {
           const info = await res.json();
 
           if (!res.ok) {
-            setIsFormating(false);
             setError(info.error);
+            setIsFormating(false);
+            setProgress(0);
             setShowErrorModal(true);
-            console.error("task error:", info.error);
             return;
           }
 
           setText(info.script);
           setSpeakers(info.speakers); // update UI
           setIsFormating(false);
+          setProgress(0);
           refetch();
-          console.log("success data", info);
         }
       } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("Upload was cancelled by user during polling");
+          clearInterval(intervalId);
+          localStorage.removeItem("task_id");
+          setError(
+            "You cancelled formatting your script, please note that if formatting already started your script quota will be deducted."
+          );
+          setIsFormating(false);
+          setProgress(0);
+          setShowErrorModal(true);
+          return;
+        }
+
         clearInterval(intervalId);
         localStorage.removeItem("task_id");
         setError("Could not format your script, please refresh or try again.");
+        setIsFormating(false);
+        setProgress(0);
         setShowErrorModal(true);
-
-        console.error("Error during polling:", error);
+        return;
       }
     }, 3000); // check every 3 seconds
   };
@@ -247,7 +274,7 @@ export default function Dashboard() {
     refetch();
   }, []);
 
-  //fetchScript
+  //fetch Script on component mount
   useEffect(() => {
     const fetchScript = async () => {
       try {
@@ -255,7 +282,7 @@ export default function Dashboard() {
         if (!token) {
           setToken(null);
           navigate("/signin");
-          throw new Error("No valid access token");
+          return;
         }
 
         setToken(token);
@@ -274,12 +301,11 @@ export default function Dashboard() {
         if (!response.ok) {
           setError(data.error);
         }
-
-        console.log("success data", data);
         setText(data.script);
         setSpeakers(data.speakers);
       } catch (error) {
-        console.error("Error fetching script:", error);
+        setError("Could not fetch script");
+        return;
       }
     };
 
@@ -292,7 +318,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  //get available voices
+  //get available voices on mount
   useEffect(() => {
     const fetchVoices = async () => {
       try {
@@ -302,10 +328,13 @@ export default function Dashboard() {
 
         const data = await response.json();
 
-        if (!response.ok) throw new Error("Failed to load voices");
+        if (!response.ok) {
+          return;
+        }
         setVoices(data);
       } catch (err) {
-        console.error("Error loading voices", err);
+        setError("Could not get script audio");
+        return;
       }
     };
 
@@ -316,11 +345,13 @@ export default function Dashboard() {
   const handlePlayScript = async () => {
     if (isLoading) return;
 
+    setIsLoading(true);
+
     const token = await checkAuthToken();
     if (!token) {
       setToken(null);
       navigate("/signin");
-      throw new Error("No valid access token");
+      return;
     }
 
     setToken(token);
@@ -332,11 +363,12 @@ export default function Dashboard() {
     //check if there is no text
     if (!text) {
       setError("You need to upload a script to generate audio");
+      setIsLoading(false);
       setShowErrorModal(true);
       return;
     }
 
-    setIsLoading(true); //start loading
+    
     //check subscription and quotas before upload
     try {
       const subscription = await fetch(
@@ -355,12 +387,13 @@ export default function Dashboard() {
         setError(status.error);
         setIsLoading(false);
         setShowErrorModal(true);
-        console.error(status);
         return;
       }
     } catch (err) {
       setError("Could not check your subscription status, please try again.");
-      return
+      setIsLoading(false);
+      setShowErrorModal(true);
+      return;
     }
 
     try {
@@ -385,32 +418,40 @@ export default function Dashboard() {
         setIsLoading(false);
         setShowErrorModal(true);
         setAbortController(null);
-        console.log(data.error);
         return;
       }
 
       localStorage.setItem("audio_id", data.task_id);
       polling(data.task_id);
     } catch (err) {
+      if (err.name === "AbortError") {
+        setError(
+          "You cancelled generating audio, please note that if formatting already started your audio quota s will be deducted"
+        );
+        setIsLoading(false);
+        setShowErrorModal(true);
+        return;
+      }
+
       setError(
-        "Our System encountered an error while processing your request, please try again later"
+        "We couldn't generate your audio, please ensure you have an active subscription and try again."
       );
       setIsLoading(false);
       setShowErrorModal(true);
-      console.log(err);
     } finally {
       setAbortController(null);
     }
   };
 
-  //next thing is to handle polling logic here
+  //handle polling logic
   const polling = (audio_id) => {
     const intervalid = setInterval(async () => {
       try {
         const token = await checkAuthToken();
         if (!token) {
           clearInterval(intervalid);
-          return redirect("/signin");
+          navigate("/signin");
+          return;
         }
 
         const controller = new AbortController();
@@ -426,12 +467,14 @@ export default function Dashboard() {
             signal: controller.signal,
           }
         );
+
         const data = await response.json();
 
         if (!response.ok) {
           clearInterval(intervalid);
           localStorage.removeItem("audio_id");
           setError(data.error);
+          setIsLoading(false);
           setShowErrorModal(true);
           return;
         }
@@ -441,17 +484,17 @@ export default function Dashboard() {
         }
 
         if (data.status === "FAILURE" || data.error) {
-          console.log("this is audio error:", data.error);
           localStorage.removeItem("audio_id");
           clearInterval(intervalid);
-          setIsLoading(false);
+
           setError(data.error || "audio generation failed, please try again");
+          setIsLoading(false);
+          setProgress(0);
           setShowErrorModal(true);
           return;
         }
 
         if (data.status === "success") {
-          console.log(data.status);
           clearInterval(intervalid);
           localStorage.removeItem("audio_id");
 
@@ -469,25 +512,45 @@ export default function Dashboard() {
           if (!res.ok) {
             setError(info.error || "audio generation failed, please try again");
             setIsLoading(false);
+            setProgress(0);
             setShowErrorModal(true);
             return;
           }
+
           const signedUrl = info.audio_url;
 
           setAudioUrl(signedUrl);
           setIsLoading(false);
+          setProgress(0);
           refetch();
         }
       } catch (error) {
+        if (error.name === "AbortError") {
+          clearInterval(intervalid);
+          localStorage.removeItem("audio_id");
+          setError(
+            "You cancelled generating your script audio, please note that if generating the audio already started your audio quota will be deducted."
+          );
+          setIsLoading(false);
+          setProgress(0);
+          setShowErrorModal(true);
+          return;
+        }
+
         clearInterval(intervalid);
         localStorage.removeItem("audio_id");
+        setError(
+          "An unexpected error occured while generating audio, please try again."
+        );
         setIsLoading(false);
-        setError(error || "An unexpected error occured during polling");
+        setProgress(0);
         setShowErrorModal(true);
+        return;
       }
     }, 3000);
   };
 
+  //fetch processed script on mount or continue polling
   useEffect(() => {
     const fetchAudio = async () => {
       try {
@@ -509,15 +572,16 @@ export default function Dashboard() {
           }
         );
 
-        if (response.ok) {
-          const data = await response.json();
-          const signedUrl = data.audio_url;
-          setAudioUrl(signedUrl);
-        } else {
-          console.error("Failed to fetch script", response.status);
+        const data = await response.json();
+
+        if (!response.ok) {
+          return;
         }
+
+        const signedUrl = data.audio_url;
+        setAudioUrl(signedUrl);
       } catch (error) {
-        console.error("Error fetching script:", error);
+        return;
       }
     };
 
@@ -582,6 +646,7 @@ export default function Dashboard() {
           error={error}
           setShowErrorModal={setShowErrorModal}
           showErrorModal={showErrorModal}
+          setHide={setHide}
         />
 
         <WelcomeScreen
@@ -595,17 +660,31 @@ export default function Dashboard() {
           {/* Main Content Area */}
 
           {/*Modal which contains the cancel button  */}
-          <Modal
-            progress={progress}
-            isLoading={isLoading}
-            abortController={abortController}
-          />
-          <FormatingScriptModal
-            progress={progress}
-            isFormating={isFormating}
-            setIsFormating={setIsFormating}
-            abortController={abortController}
-          />
+          {hide && (
+            <Modal
+              progress={progress}
+              setProgress={setProgress}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              abortController={abortController}
+              setError={setError}
+              setShowErrorModal={setShowErrorModal}
+              setHide={setHide}
+            />
+          )}
+
+          {hide && (
+            <FormatingScriptModal
+              progress={progress}
+              setProgress={setProgress}
+              isFormating={isFormating}
+              setIsFormating={setIsFormating}
+              abortController={abortController}
+              setError={setError}
+              setShowErrorModal={setShowErrorModal}
+              setHide={setHide}
+            />
+          )}
 
           <main className="flex-1 p-6 bg-white">
             <div className="flex flex-col lg:flex-row justify-between gap-4">
@@ -695,7 +774,7 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-                <div className="flex rounded-lg gap-4 lg:absolute bottom-0 left-0 border p-4  bg-[#2E3A87] text-white w-full">
+                <div className="flex rounded-lg gap-4 lg:absolute bottom-0 left-0 border p-4   bg-[#2E3A87] text-white w-full">
                   <button
                     onClick={handlePlayScript}
                     className="flex rounded-lg cursor-pointer border border-[#5C6BC0] items-center gap-2 py-1 px-4 py-2 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"

@@ -15,9 +15,7 @@ export const TokenProvider = ({ children }) => {
       const newToken = await checkAuthToken();
 
       if (!newToken) {
-        alert("You have been logged out, log back in to continue.");
         setToken(null);
-        navigate("/");
       } else {
         setToken(newToken);
       }
