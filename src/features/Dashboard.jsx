@@ -368,7 +368,6 @@ export default function Dashboard() {
       return;
     }
 
-    
     //check subscription and quotas before upload
     try {
       const subscription = await fetch(
@@ -688,35 +687,37 @@ export default function Dashboard() {
 
           <main className="flex-1 p-6 bg-white">
             <div className="flex flex-col lg:flex-row justify-between gap-4">
-              <div
-                placeholder="Type or paste your script here..."
-                className="flex items-center justify-center shadow-sm lg:w-3/4 h-[70vh] border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                <div className="flex flex-col items-center justify-center gap-2">
-                  {/* handle fil change, it's not shown */}
-                  <input
-                    type="file"
-                    accept=".txt,.pdf,.docx" // adjust based on what you want to allow
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
+              
+                <div
+                  placeholder="Type or paste your script here..."
+                  className="flex items-center justify-center shadow-sm lg:w-2/3 h-[70vh] border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+                >
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    {/* handle fil change, it's not shown */}
+                    <input
+                      type="file"
+                      accept=".txt,.pdf,.docx" // adjust based on what you want to allow
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
 
-                  {/* upload icon */}
-                  <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
-                  <p>upload your scripts, txt, doc, pdf.</p>
+                    {/* upload icon */}
+                    <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
+                    <p>upload your scripts, txt, doc, pdf.</p>
 
-                  {fileName && <p>{fileName}</p>}
+                    {fileName && <p>{fileName}</p>}
 
-                  <button
-                    onClick={handleClick}
-                    className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
-                  >
-                    <FiUpload />
-                    Load Script
-                  </button>
+                    <button
+                      onClick={handleClick}
+                      className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
+                    >
+                      <FiUpload />
+                      Load Script
+                    </button>
+                  </div>
                 </div>
-              </div>
+              
 
               <div className="relative shadow-sm border border-gray-300 rounded-lg">
                 <p className="bg-[#2E3A87] text-white p-4 rounded-lg">Audio:</p>
