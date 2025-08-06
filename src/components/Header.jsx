@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useToken } from "../store/AuthContext";
 import { SlMenu } from "react-icons/sl";
 import LogOutButton from "./LogOutButton";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { RiAccountCircleLine } from "react-icons/ri";
 
@@ -34,12 +35,7 @@ export default function Header() {
           ScriptReadr
         </div>
 
-        {/* profile icon, show only on small screen sizes and only if there is a token */}
-        {token && (
-          <div onClick={handleOpenProfile} className=" mr-10 lg:hidden hover:cursor-pointer">
-            <RiAccountCircleLine className="text-white text-3xl" />
-          </div>
-        )}
+        
 
         {/* hamburger menu button only show on sm-md screen sizes */}
         <button
@@ -91,8 +87,14 @@ export default function Header() {
       </nav>
 
       {/* Mobile Navigation */}
+      <AnimatePresence>
       {isOpen && (
-        <div className=" absolute text-white pl-10 border z-10 lg:hidden bg-[#2E3A87] border-[#2E3A87]">
+        <motion.div
+        initial={{ y: "-100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "-100%" }}
+        transition={{ duration: 0.3 }}
+         className=" absolute text-white pl-10 border z-10 lg:hidden bg-[#2E3A87] border-[#2E3A87]">
           <ul>
             <li
               onClick={handleOpenMenu}
@@ -155,39 +157,12 @@ export default function Header() {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
-      {/* user account profile view on small screens */}
 
-      {openProfile && token && (
-        <div className="bg-[#2E3A87] text-white fixed right-0 px-10">
-          <Link to="/userprofile" className="block  mb-3">
-            Account
-          </Link>
-          <Link className="block mb-3">Subscription</Link>
-          <div className="mb-3">
-            Free – <span className="font-semibold text-green-600">Current</span>
-          </div>
-          <Link to="/pricing" className="block mb-3">
-            Get Premium
-          </Link>
-          <Link to="/pricing" className="block mb-3">
-            Get Pro
-          </Link>
-            <hr className="border-gray-300" />
-            <Link
-              to="/contact"
-              className="block  mb-3"
-            >
-              Support
-            </Link>
-            <div className="mb-3">
-              <LogOutButton />
-            </div>
-            
-        </div>
-      )}
+    
     </>
   );
 }

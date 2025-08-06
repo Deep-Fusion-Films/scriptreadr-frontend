@@ -3,8 +3,7 @@ import Router from "./routes/Routes";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function App() {
-  const clientId =
-    "135799665008-nqh5inpkv6u736uapau9p236h06nh2rm.apps.googleusercontent.com";
+  const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID
 
   return (
     <>

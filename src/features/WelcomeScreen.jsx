@@ -11,11 +11,15 @@ export default function WelcomeScreen({ showWelcome, setShowWelcome }) {
     }
   }, []);
 
-  const handleCloseWelcome = () => {
+  const handleHideWelcome = () => {
     // Set cookie for 1 year
     Cookies.set("has_seen_welcome", "true", { expires: 365 });
     setShowWelcome(false);
   };
+
+  const handleCloseWelcome = () => {
+    setShowWelcome(false)
+  }
 
   return (
     <>
@@ -52,6 +56,7 @@ export default function WelcomeScreen({ showWelcome, setShowWelcome }) {
               </Link>{" "}
               on how to use ScriptReadr
             </p>
+            <p>If you don't want to see this welcome screen again click: <button onClick={handleHideWelcome} className="text-[#2E3A87] hover:cursor-pointer">Don't Show again</button></p>
           </div>
         </div>
       )}

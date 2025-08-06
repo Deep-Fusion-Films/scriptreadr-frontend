@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+//icons
 import { FiSave, FiMusic } from "react-icons/fi";
 import { FiUpload } from "react-icons/fi";
 import { FaFileCirclePlus } from "react-icons/fa6";
+import { FaArrowAltCircleRight } from "react-icons/fa";
+
 
 import SideBar from "./SideBar";
 import Modal from "./Modal";
@@ -45,6 +48,9 @@ export default function Dashboard() {
   //state for playing, pausing and stopping the audio
   const [audioUrl, setAudioUrl] = useState(null);
 
+  //state for showing the sidebar in small screen sizes
+  const [showSideBar, setShowSideBar] = useState(false)
+
   const [speakers, setSpeakers] = useState([]);
   const [speakerVoices, setSpeakerVoices] = useState({});
 
@@ -53,6 +59,9 @@ export default function Dashboard() {
   const [error, setError] = useState("");
 
   const [showErrorModal, setShowErrorModal] = useState(false);
+
+  //this state variable handles conditionally rendering the 'saving...' message in the save audio button
+  const [saving, setSaving] = useState(false);
 
   //we use this state to temporarily hide the formatingScriptModal, when canceling the formating fails
   const [hide, setHide] = useState(true);
@@ -598,18 +607,19 @@ export default function Dashboard() {
     setOpen(false);
 
     if (type === "file") {
-      console.log("File saved");
-      // Add your file-saving logic here if needed.
     } else if (type === "audio") {
       if (audioUrl) {
+        setSaving(true);
+
         try {
           // Fetch the audio data as a Blob
           const response = await fetch(audioUrl);
           if (!response.ok) {
+            setSaving(false);
             throw new Error("Failed to fetch audio file.");
           }
-          const blob = await response.blob();
 
+          const blob = await response.blob();
           // Create downloadable URL from Blob
           const url = URL.createObjectURL(blob);
 
@@ -626,17 +636,24 @@ export default function Dashboard() {
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
 
-          console.log("Audio downloaded successfully");
         } catch (error) {
           console.error("Error downloading audio:", error);
+          setSaving(false);
           alert("An error occurred while downloading the audio.");
+        } finally {
+          setSaving(false);
         }
       } else {
-        alert("No audio available to download yet.");
-        console.warn("Attempted to download, but no audio is ready.");
+        setError("No audio available to download yet.");
+        setShowErrorModal(true)
       }
     }
   };
+
+  //handle setShowSideBar
+  const handleSetShowSideBar = () => {
+    setShowSideBar(true)
+  }
 
   return (
     <>
@@ -654,7 +671,7 @@ export default function Dashboard() {
         />
 
         <div className="flex flex-1">
-          <SideBar />
+          <SideBar showSideBar={showSideBar} setShowSideBar={setShowSideBar} />
 
           {/* Main Content Area */}
 
@@ -688,36 +705,39 @@ export default function Dashboard() {
           <main className="flex-1 p-6 bg-white">
             <div className="flex flex-col lg:flex-row justify-between gap-4">
               
-                <div
-                  placeholder="Type or paste your script here..."
-                  className="flex items-center justify-center shadow-sm lg:w-2/3 h-[70vh] border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
-                >
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    {/* handle fil change, it's not shown */}
-                    <input
-                      type="file"
-                      accept=".txt,.pdf,.docx" // adjust based on what you want to allow
-                      ref={fileInputRef}
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-
-                    {/* upload icon */}
-                    <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
-                    <p>upload your scripts, txt, doc, pdf.</p>
-
-                    {fileName && <p>{fileName}</p>}
-
-                    <button
-                      onClick={handleClick}
-                      className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
-                    >
-                      <FiUpload />
-                      Load Script
-                    </button>
-                  </div>
+              <div
+                placeholder="Type or paste your script here..."
+                className=" relative flex items-center justify-center shadow-sm lg:w-2/3 h-[70vh] border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <div onClick={handleSetShowSideBar} className="hover:cursor-pointer">
+                <FaArrowAltCircleRight className="absolute left-4 top-5 text-2xl text-[#5C6BC0] lg:hidden" />
                 </div>
-              
+
+                <div className="flex flex-col items-center justify-center gap-2">
+                  {/* handle fil change, it's not shown */}
+                  <input
+                    type="file"
+                    accept=".txt,.pdf,.docx" // adjust based on what you want to allow
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+
+                  {/* upload icon */}
+                  <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
+                  <p>upload your scripts, txt, doc, pdf.</p>
+
+                  {fileName && <p>{fileName}</p>}
+
+                  <button
+                    onClick={handleClick}
+                    className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
+                  >
+                    <FiUpload />
+                    Load Script
+                  </button>
+                </div>
+              </div>
 
               <div className="relative shadow-sm border border-gray-300 rounded-lg">
                 <p className="bg-[#2E3A87] text-white p-4 rounded-lg">Audio:</p>
@@ -729,7 +749,7 @@ export default function Dashboard() {
                     className="whitespace-nowrap inline-flex items-center rounded-lg shadow-sm gap-2 py-1 px-3 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
                   >
                     <FiSave />
-                    Save audio
+                    {saving ? "Saving..." : "Save audio"}
                   </button>
                 </div>
 
