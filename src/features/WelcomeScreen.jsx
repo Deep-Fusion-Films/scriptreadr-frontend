@@ -3,11 +3,15 @@ import { FiX } from "react-icons/fi";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
-export default function WelcomeScreen({ showWelcome, setShowWelcome }) {
+export default function WelcomeScreen({ showWelcome, setShowWelcome, isFormating }) {
+
   useEffect(() => {
     const hasSeenWelcome = Cookies.get("has_seen_welcome");
     if (!hasSeenWelcome) {
       setShowWelcome(true);
+    }
+    if (isFormating) {
+      setShowWelcome(false)
     }
   }, []);
 

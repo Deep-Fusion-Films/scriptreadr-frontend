@@ -668,6 +668,7 @@ export default function Dashboard() {
         <WelcomeScreen
           showWelcome={showWelcome}
           setShowWelcome={setShowWelcome}
+          isFormating={isFormating}
         />
 
         <div className="flex flex-1">
@@ -726,6 +727,7 @@ export default function Dashboard() {
                   {/* upload icon */}
                   <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
                   <p>upload your scripts, txt, doc, pdf.</p>
+                  <p>Max file Size is 2MB</p>
 
                   {fileName && <p>{fileName}</p>}
 

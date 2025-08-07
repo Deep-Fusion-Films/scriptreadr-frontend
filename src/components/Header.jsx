@@ -29,7 +29,7 @@ export default function Header() {
 
   return (
     <>
-      <nav className="relative flex flex-row items-center py-4 bg-[#2E3A87]">
+      <nav className="relative flex flex-row items-center py-4 bg-[#2E3A87] ibm-plex-mono-regular">
         {/* logo */}
         <div className="text-xl  text-white font-bold ml-auto mr-10 lg:ml-10">
           ScriptReadr

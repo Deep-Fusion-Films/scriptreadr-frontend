@@ -71,7 +71,7 @@ const [isLoading, setIsloading] = useState(false)
       <ModalPopUp isLoading={isLoading} text={"Signing you in please wait..."} />
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6 text-[#2E3A87]">
-          Sign in with Speaker
+          Sign in
         </h2>
         <ResponseMessage response={response} />
         <form onSubmit={handleSubmit} className="space-y-4">

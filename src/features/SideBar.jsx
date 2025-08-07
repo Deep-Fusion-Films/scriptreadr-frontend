@@ -32,31 +32,50 @@ export default function SideBar({ showSideBar, setShowSideBar }) {
             </div>
           </div>
 
-          <div className="text-sm text-gray-600 mt-2 ml-2">
-            <p>Scripts Remaining:</p>
-            <div className="border rounded-3xl m-6 py-1 text-center text-white bg-[#5C6BC0] shadow-2xl">
-              <p>
-                {isFetching
-                  ? "Fetching Remaining Scripts..."
-                  : currentSubscription
-                  ? `${currentSubscription.scripts_remaining}`
-                  : fetchError || "No remaining scripts."}
-              </p>
-            </div>
-          </div>
+          {currentSubscription && currentSubscription.current_plan !== "Not Subscribed" && (
+            <>
+              <div className="text-sm text-gray-600 mt-2 ml-2">
+                <p>Expires at:</p>
+                <div className="border rounded-3xl m-6 py-1 text-center text-white bg-[#5C6BC0] shadow-2xl">
+                  <p>
+                    {isFetching
+                      ? "..."
+                      : currentSubscription
+                      ? `${new Date(
+                          currentSubscription.current_period_end
+                        ).toLocaleDateString()}`
+                      : fetchError || "No remaining scripts."}
+                  </p>
+                </div>
+              </div>
 
-          <div className="text-sm text-gray-600 mt-2 ml-2">
-            <p>Audio Remaining:</p>
-            <div className="border rounded-3xl m-6 py-1 text-center text-white bg-[#5C6BC0] shadow-2xl">
-              <p>
-                {isFetching
-                  ? "Fetching Remaining audio..."
-                  : currentSubscription
-                  ? `${currentSubscription.audio_remaining}`
-                  : fetchError || "No remaining scripts."}
-              </p>
-            </div>
-          </div>
+              <div className="text-sm text-gray-600 mt-2 ml-2">
+                <p>Scripts Remaining:</p>
+                <div className="border rounded-3xl m-6 py-1 text-center text-white bg-[#5C6BC0] shadow-2xl">
+                  <p>
+                    {isFetching
+                      ? "..."
+                      : currentSubscription
+                      ? `${currentSubscription.scripts_remaining}`
+                      : fetchError || "No remaining scripts."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-600 mt-2 ml-2">
+                <p>Audio Remaining:</p>
+                <div className="border rounded-3xl m-6 py-1 text-center text-white bg-[#5C6BC0] shadow-2xl">
+                  <p>
+                    {isFetching
+                      ? "..."
+                      : currentSubscription
+                      ? `${currentSubscription.audio_remaining}`
+                      : fetchError || "No remaining scripts."}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
         </nav>
       </div>
 
