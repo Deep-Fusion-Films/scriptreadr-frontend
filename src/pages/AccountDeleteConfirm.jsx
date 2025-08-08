@@ -11,11 +11,7 @@ export default function AccountDeleteConfirm() {
   const navigate = useNavigate();
   const { setToken } = useToken();
 
-  const handleFeedbackSubmit = () => {
-    // Replace with actual API call if needed
-    console.log("Feedback submitted:", feedback);
-    setSubmitted(true);
-  };
+ 
 
   const handleProceedDelete = async () => {
     // Redirect to final delete confirmation handler
@@ -81,35 +77,6 @@ export default function AccountDeleteConfirm() {
             This action is irreversible. Please be sure before proceeding.
           </p>
         </div>
-
-        {!submitted ? (
-          <div className="space-y-3">
-            <label
-              htmlFor="feedback"
-              className="block text-sm font-medium text-gray-700"
-            >
-              We’d love your feedback before you leave (optional):
-            </label>
-            <textarea
-              id="feedback"
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
-              placeholder="Let us know why you are deleting your account..."
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              rows={4}
-            />
-            <button
-              onClick={handleFeedbackSubmit}
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              Submit Feedback
-            </button>
-          </div>
-        ) : (
-          <p className="text-green-600 text-center">
-            Thank you for your feedback!
-          </p>
-        )}
 
         <button
           onClick={handleProceedDelete}
