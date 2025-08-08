@@ -53,13 +53,6 @@ export default function WelcomeScreen({ showWelcome, setShowWelcome, isFormating
                 <span className="text-[#2E3A87]">subscription</span>
               </Link>
             </p>
-            <p className="mb-4">
-              Also, for ease of use, we advice that you go through the quick{" "}
-              <Link to="/">
-                <span className="text-[#2E3A87]">tutorial</span>
-              </Link>{" "}
-              on how to use ScriptReadr
-            </p>
             <p>If you don't want to see this welcome screen again click: <button onClick={handleHideWelcome} className="text-[#2E3A87] hover:cursor-pointer">Don't Show again</button></p>
           </div>
         </div>
