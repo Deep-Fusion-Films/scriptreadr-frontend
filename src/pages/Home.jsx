@@ -11,10 +11,10 @@ export default function Home() {
           transition={{ duration: 0.9, ease: "easeIn" }}
           className="text-xl lg:text-2xl"
         >
-          <h1>
+          <h1 className="lg:px-50 px-5">
             Bring your scripts to life with Deep Fusion Films' ScriptReadr, an
             AI powered script reading tool that brings voice and character to
-            your scripts, formats and polish your scripts like a pro
+            your scripts.
           </h1>
         </motion.div>
 
@@ -62,7 +62,7 @@ export default function Home() {
             <h2 className="text-lg font-semibold mb-2">Generate Audio</h2>
             <p className="text-sm text-white">
               Generate audio with assigned voices, sit back and listen as your
-              script come to life.
+              script comes to life.
             </p>
           </div>
         </div>
