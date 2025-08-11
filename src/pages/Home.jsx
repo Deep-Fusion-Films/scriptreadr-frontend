@@ -94,7 +94,7 @@ export default function Home() {
           >
             <iframe
               className="absolute top-0 left-0 w-full h-full rounded-lg shadow-md"
-              src="https://www.youtube.com/embed/PjJofEuSA78?si=YuUuh5bK-cD0oz6I"
+              src="https://www.youtube.com/embed/V"
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
