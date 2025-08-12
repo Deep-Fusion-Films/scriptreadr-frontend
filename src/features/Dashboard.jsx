@@ -792,6 +792,8 @@ export default function Dashboard() {
                         <SpeakerListPreviewButton
                           speaker={speaker}
                           speakerVoices={speakerVoices}
+                          setError={setError}
+                          setShowErrorModal={setShowErrorModal}
                         />
                       </div>
                     ))}
