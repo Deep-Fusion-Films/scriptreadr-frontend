@@ -14,7 +14,7 @@ export default function SideBar({ showSideBar, setShowSideBar }) {
             to="/userprofile"
             className="block hover:text-[#2E3A87] text-[#5C6BC0]"
           >
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <p>Account</p> <TfiNewWindow />
             </div>
           </Link>
