@@ -405,6 +405,8 @@ export default function Dashboard() {
     }
 
     try {
+
+      
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
         method: "POST",
         headers: {
@@ -639,6 +641,7 @@ export default function Dashboard() {
         } catch (error) {
           console.error("Error downloading audio:", error);
           setSaving(false);
+          console.log(error.message)
           alert("An error occurred while downloading the audio.");
         } finally {
           setSaving(false);

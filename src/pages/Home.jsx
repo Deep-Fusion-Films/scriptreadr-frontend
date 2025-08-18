@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
+import TestimonialCarousel from "../components/TestimonialCarousel";
+
 export default function Home() {
   return (
     <>
@@ -42,7 +44,7 @@ export default function Home() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:px-30">
-          <div className="border-t-3 border-l-3  text-white shadow-2xl p-6 rounded lg:p-15">
+          <div className="border-t-3 border-l-3  text-white shadow-2xl p-6 rounded-4xl lg:p-15">
             <h2 className="text-lg font-semibold mb-2">
               Upload any Script Style.
             </h2>
@@ -52,13 +54,13 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="border-r-3 border-l-3 text-white shadow-2xl p-6 rounded lg:p-15">
+          <div className="border-r-3 border-l-3 text-white shadow-2xl p-6 rounded-4xl lg:p-15">
             <h2 className="text-lg font-semibold mb-2">Assign Voices</h2>
             <p className="text-sm text-white">
               Assign voice to all characters in your script
             </p>
           </div>
-          <div className="border-t-3 border-r-3 text-white  shadow-2xl p-6 rounded lg:p-15">
+          <div className="border-t-3 border-r-3 text-white  shadow-2xl p-6 rounded-4xl lg:p-15">
             <h2 className="text-lg font-semibold mb-2">Generate Audio</h2>
             <p className="text-sm text-white">
               Generate audio with assigned voices, sit back and listen as your
@@ -111,10 +113,11 @@ export default function Home() {
           <div className="text-center text-white ">
             <p className="lg:px-100">
               <i>
-               Whether you're prepping for an audition, creating a voice-over-reel,
-               animation your screenplay, or just want to hear your words out loud,
-               Script Readr gives your script a voice. Upload your script, assign voices,
-               and let the characters come alive.
+                Whether you're prepping for an audition, creating a
+                voice-over-reel, animation your screenplay, or just want to hear
+                your words out loud, Script Readr gives your script a voice.
+                Upload your script, assign voices, and let the characters come
+                alive.
               </i>
             </p>
           </div>
