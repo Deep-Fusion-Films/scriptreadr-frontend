@@ -114,7 +114,7 @@ export default function Home() {
             <p className="lg:px-100">
               <i>
                 Whether you're prepping for an audition, creating a
-                voice-over-reel, animation your screenplay, or just want to hear
+                voice-over-reel, animating your screenplay, or just want to hear
                 your words out loud, Script Readr gives your script a voice.
                 Upload your script, assign voices, and let the characters come
                 alive.
