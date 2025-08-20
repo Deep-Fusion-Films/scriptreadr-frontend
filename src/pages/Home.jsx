@@ -122,6 +122,7 @@ export default function Home() {
             </p>
           </div>
         </div>
+        <TestimonialCarousel />
       </section>
     </>
   );
