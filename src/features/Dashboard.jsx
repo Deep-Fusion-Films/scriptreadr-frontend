@@ -406,7 +406,7 @@ export default function Dashboard() {
 
     try {
 
-      
+
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
         method: "POST",
         headers: {
@@ -672,6 +672,7 @@ export default function Dashboard() {
           showWelcome={showWelcome}
           setShowWelcome={setShowWelcome}
           isFormating={isFormating}
+          isLoading={isLoading}
         />
 
         <div className="flex flex-1">

@@ -227,14 +227,14 @@ export default function UserProfile() {
             </form>
           </div>
 
-          {!isEditingFirstName && (
+          {/* {!isEditingFirstName && (
             <button
               onClick={handleToggleFirstName}
               className="mt-2 md:mt-0 text-white px-4 py-1 rounded-2xl bg-[#5C6BC0] hover:bg-[#3F4C9A] hover:cursor-pointer"
             >
               Update
             </button>
-          )}
+          )} */}
 
           {isEditingFirstName && (
             <button
@@ -267,7 +267,7 @@ export default function UserProfile() {
               <p className="text-gray-900 mt-1">{lastName}</p>
             )}
           </div>
-
+{/* 
           {!isEditingLastName && (
             <button
               onClick={handleToggleLastName}
@@ -285,7 +285,7 @@ export default function UserProfile() {
             >
               {isSaving ? "Save..." : "Save"}
             </button>
-          )}
+          )} */}
         </div>
 
         {/* Email */}

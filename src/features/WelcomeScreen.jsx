@@ -1,18 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FiX } from "react-icons/fi";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";
 
-export default function WelcomeScreen({ showWelcome, setShowWelcome, isFormating }) {
+export default function WelcomeScreen({
+  showWelcome,
+  setShowWelcome,
+  isFormating,
+  isLoading,
+}) {
+
+ 
 
   useEffect(() => {
     const hasSeenWelcome = Cookies.get("has_seen_welcome");
-    if (!hasSeenWelcome) {
+    
+    if(!hasSeenWelcome) {
       setShowWelcome(true);
     }
-    if (isFormating) {
-      setShowWelcome(false)
-    }
+
   }, []);
 
   const handleHideWelcome = () => {
@@ -22,12 +28,12 @@ export default function WelcomeScreen({ showWelcome, setShowWelcome, isFormating
   };
 
   const handleCloseWelcome = () => {
-    setShowWelcome(false)
-  }
+    setShowWelcome(false);
+  };
 
   return (
     <>
-      {showWelcome && (
+      {showWelcome && !isLoading && !isFormating && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 rounded-md">
           <div className=" fadeIn relative bg-white p-6 rounded-3xl shadow-lg text-center w-150 border-3 border-[#2E3A87]">
             {/* Cancel Icon Button */}
@@ -53,7 +59,15 @@ export default function WelcomeScreen({ showWelcome, setShowWelcome, isFormating
                 <span className="text-[#2E3A87]">subscription</span>
               </Link>
             </p>
-            <p>If you don't want to see this welcome screen again click: <button onClick={handleHideWelcome} className="text-[#2E3A87] hover:cursor-pointer">Don't Show again</button></p>
+            <p>
+              If you don't want to see this welcome screen again click:{" "}
+              <button
+                onClick={handleHideWelcome}
+                className="text-[#2E3A87] hover:cursor-pointer"
+              >
+                Don't Show again
+              </button>
+            </p>
           </div>
         </div>
       )}
