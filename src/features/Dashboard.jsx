@@ -712,7 +712,7 @@ export default function Dashboard() {
               
               <div
                 placeholder="Type or paste your script here..."
-                className=" relative flex items-center justify-center shadow-sm lg:w-2/3 h-[70vh]  border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className=" relative flex items-center justify-center shadow-sm lg:w-2/3 h-[75vh]  border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
                 <div onClick={handleSetShowSideBar} className="hover:cursor-pointer">
                 <FaArrowAltCircleRight className="absolute left-4 top-5 text-2xl text-[#5C6BC0] lg:hidden" />
@@ -803,7 +803,7 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-                <div className="flex lg:absolute rounded-lg bottom-0 left-0 border p-4   bg-[#2E3A87] text-white w-full">
+                <div className="flex lg:absolute rounded-lg bottom-0 left-0 border p-2   bg-[#2E3A87] text-white w-full">
                   <button
                     onClick={handlePlayScript}
                     className="flex rounded-lg cursor-pointer border border-[#5C6BC0] items-center gap-2 py-1 px-4 py-2 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"

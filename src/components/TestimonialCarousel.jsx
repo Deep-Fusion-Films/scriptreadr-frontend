@@ -66,7 +66,7 @@ export default function TestimonialCarousel() {
                 exit="exit"
                 transition={{ duration: 0.5 }}
               >
-                <div className="border-x-3 rounded-4xl border-white p-6 lg:p-15">
+                <div className="border-x-3 rounded-4xl border-white p-1 lg:p-6 lg:p-15">
                   <p className="text-white mb-4">
                     <i>{listItems[currentIndex].name}</i>
                   </p>

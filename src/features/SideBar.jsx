@@ -95,7 +95,7 @@ export default function SideBar({ showSideBar, setShowSideBar }) {
           </div>
         </Link>
 
-        <button className="text-red-600 hover:underline">Sign Out</button>
+        {/* <button className="text-red-600 hover:underline">Sign Out</button> */}
       </div>
     </>
   );
