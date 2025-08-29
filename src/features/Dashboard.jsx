@@ -7,7 +7,6 @@ import { FiUpload } from "react-icons/fi";
 import { FaFileCirclePlus } from "react-icons/fa6";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 
-
 import SideBar from "./SideBar";
 import Modal from "./Modal";
 import AudioPlayer from "./AudioPlayer";
@@ -49,7 +48,7 @@ export default function Dashboard() {
   const [audioUrl, setAudioUrl] = useState(null);
 
   //state for showing the sidebar in small screen sizes
-  const [showSideBar, setShowSideBar] = useState(false)
+  const [showSideBar, setShowSideBar] = useState(false);
 
   const [speakers, setSpeakers] = useState([]);
   const [speakerVoices, setSpeakerVoices] = useState({});
@@ -150,7 +149,8 @@ export default function Dashboard() {
         return;
       }
       localStorage.setItem("task_id", data.task_id);
-      startPolling(data.task_id);
+      startWebSocket(data.task_id);
+      //startPolling(data.task_id);
     } catch (error) {
       if (error.name === "AbortError") {
         setError(
@@ -173,109 +173,166 @@ export default function Dashboard() {
   };
 
   //polling task function
-  const startPolling = (taskId) => {
-    const intervalId = setInterval(async () => {
-      try {
-        const token = await checkAuthToken();
-        if (!token) {
-          clearInterval(intervalId);
-          navigate("/signin");
-          return;
-        }
+  // const startPolling = (taskId) => {
+  //   const intervalId = setInterval(async () => {
+  //     try {
+  //       const token = await checkAuthToken();
+  //       if (!token) {
+  //         clearInterval(intervalId);
+  //         navigate("/signin");
+  //         return;
+  //       }
 
-        const controller = new AbortController();
-        setAbortController(controller);
+  //       const controller = new AbortController();
+  //       setAbortController(controller);
 
-        const response = await fetch(
-          `${import.meta.env.VITE_LOCAL}/file/task-status/${taskId}/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            signal: controller.signal,
-          }
-        );
+  //       const response = await fetch(
+  //         `${import.meta.env.VITE_LOCAL}/file/task-status/${taskId}/`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           signal: controller.signal,
+  //         }
+  //       );
 
-        const data = await response.json();
+  //       const data = await response.json();
 
-        if (!response.ok) {
-          clearInterval(intervalId);
-          localStorage.removeItem("task_id");
-          setError(data.error);
-          setIsFormating(false);
-          setShowErrorModal(true);
-          return;
-        }
+  //       if (!response.ok) {
+  //         clearInterval(intervalId);
+  //         localStorage.removeItem("task_id");
+  //         setError(data.error);
+  //         setIsFormating(false);
+  //         setShowErrorModal(true);
+  //         return;
+  //       }
 
-        if (data.status === "PROGRESS" && typeof data.progress === "number") {
-          setProgress(data.progress);
-        }
+  //       if (data.status === "PROGRESS" && typeof data.progress === "number") {
+  //         setProgress(data.progress);
+  //       }
 
-        if (data.status === "FAILURE" || data.error) {
-          clearInterval(intervalId);
-          localStorage.removeItem("task_id");
-          setError(
-            data.error || "Error formatting Script, please try again later"
-          );
-          setIsFormating(false);
-          setProgress(0);
-          setShowErrorModal(true);
-          return;
-        }
+  //       if (data.status === "FAILURE" || data.error) {
+  //         clearInterval(intervalId);
+  //         localStorage.removeItem("task_id");
+  //         setError(
+  //           data.error || "Error formatting Script, please try again later"
+  //         );
+  //         setIsFormating(false);
+  //         setProgress(0);
+  //         setShowErrorModal(true);
+  //         return;
+  //       }
 
-        if (data.status === "success") {
-          clearInterval(intervalId);
-          localStorage.removeItem("task_id"); // clean up
-          const res = await fetch(
-            `${import.meta.env.VITE_LOCAL}/file/script/`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+  //       if (data.status === "success") {
+  //         clearInterval(intervalId);
+  //         localStorage.removeItem("task_id"); // clean up
+  //         const res = await fetch(
+  //           `${import.meta.env.VITE_LOCAL}/file/script/`,
+  //           {
+  //             method: "GET",
+  //             headers: {
+  //               Authorization: `Bearer ${token}`,
+  //             },
+  //           }
+  //         );
 
-          const info = await res.json();
+  //         const info = await res.json();
 
-          if (!res.ok) {
-            setError(info.error);
-            setIsFormating(false);
-            setProgress(0);
-            setShowErrorModal(true);
-            return;
-          }
+  //         if (!res.ok) {
+  //           setError(info.error);
+  //           setIsFormating(false);
+  //           setProgress(0);
+  //           setShowErrorModal(true);
+  //           return;
+  //         }
 
-          setText(info.script);
-          setSpeakers(info.speakers); // update UI
-          setIsFormating(false);
-          setProgress(0);
-          refetch();
-        }
-      } catch (error) {
-        if (error.name === "AbortError") {
-          console.log("Upload was cancelled by user during polling");
-          clearInterval(intervalId);
-          localStorage.removeItem("task_id");
-          setError(
-            "You cancelled formatting your script, please note that if formatting already started your script quota will be deducted."
-          );
-          setIsFormating(false);
-          setProgress(0);
-          setShowErrorModal(true);
-          return;
-        }
+  //         setText(info.script);
+  //         setSpeakers(info.speakers); // update UI
+  //         setIsFormating(false);
+  //         setProgress(0);
+  //         refetch();
+  //       }
+  //     } catch (error) {
+  //       if (error.name === "AbortError") {
+  //         console.log("Upload was cancelled by user during polling");
+  //         clearInterval(intervalId);
+  //         localStorage.removeItem("task_id");
+  //         setError(
+  //           "You cancelled formatting your script, please note that if formatting already started your script quota will be deducted."
+  //         );
+  //         setIsFormating(false);
+  //         setProgress(0);
+  //         setShowErrorModal(true);
+  //         return;
+  //       }
 
-        clearInterval(intervalId);
+  //       clearInterval(intervalId);
+  //       localStorage.removeItem("task_id");
+  //       setError("Could not format your script, please refresh or try again.");
+  //       setIsFormating(false);
+  //       setProgress(0);
+  //       setShowErrorModal(true);
+  //       return;
+  //     }
+  //   }, 3000); // check every 3 seconds
+  // };
+
+  //websocket client
+  let socket;
+  const startWebSocket = (taskId) => {
+    //open websocket connection
+    socket = new WebSocket(`ws://localhost:8000/ws/task/`);
+
+    socket.onopen = () => {
+      console.log("WebSocket connected");
+        socket.send(JSON.stringify({ task_id: taskId }));
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data);
+
+      if (data.status === "PROGRESS" && typeof data.progress === "number") {
+        setProgress(data.progress);
+      }
+
+      if (data.status === "FAILURE" || data.error) {
+        socket.close();
         localStorage.removeItem("task_id");
-        setError("Could not format your script, please refresh or try again.");
+        setError(
+          data.error || "Error formatting script, please try again later"
+        );
         setIsFormating(false);
         setProgress(0);
         setShowErrorModal(true);
         return;
       }
-    }, 3000); // check every 3 seconds
+
+      if (data.status === "SUCCESS") {
+        socket.close();
+        localStorage.removeItem("task_id");
+        setText(data.script);
+        setSpeakers(data.speakers);
+        setIsFormating(false);
+        setProgress(0);
+        refetch();
+      }
+    };
+
+    socket.onclose = (event) => {
+      console.log("websocket close", event);
+    };
+
+    socket.onerror = (error) => {
+      console.log("websocket error", error);
+      socket.close();
+      localStorage.removeItem("task_id");
+      setError("Could not format your script, please refresh or try again.");
+      setIsFormating(false);
+      setProgress(0);
+      setShowErrorModal(true);
+    };
   };
 
   //fetch subscription data on mount
@@ -321,7 +378,8 @@ export default function Dashboard() {
     const existingTaskId = localStorage.getItem("task_id");
     if (existingTaskId) {
       setIsFormating(true);
-      startPolling(existingTaskId);
+      startWebSocket(existingTaskId);
+      //startPolling(existingTaskId);
     } else {
       fetchScript();
     }
@@ -405,8 +463,6 @@ export default function Dashboard() {
     }
 
     try {
-
-
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
         method: "POST",
         headers: {
@@ -637,26 +693,25 @@ export default function Dashboard() {
           // Clean up
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-
         } catch (error) {
           console.error("Error downloading audio:", error);
           setSaving(false);
-          console.log(error.message)
+          console.log(error.message);
           alert("An error occurred while downloading the audio.");
         } finally {
           setSaving(false);
         }
       } else {
         setError("No audio available to download yet.");
-        setShowErrorModal(true)
+        setShowErrorModal(true);
       }
     }
   };
 
   //handle setShowSideBar
   const handleSetShowSideBar = () => {
-    setShowSideBar(true)
-  }
+    setShowSideBar(true);
+  };
 
   return (
     <>
@@ -709,13 +764,15 @@ export default function Dashboard() {
 
           <main className="flex-1 p-6 bg-white">
             <div className="flex flex-col lg:flex-row justify-between gap-4">
-              
               <div
                 placeholder="Type or paste your script here..."
                 className=" relative flex items-center justify-center shadow-sm lg:w-2/3 h-[75vh]  border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
-                <div onClick={handleSetShowSideBar} className="hover:cursor-pointer">
-                <FaArrowAltCircleRight className="absolute left-4 top-5 text-2xl text-[#5C6BC0] lg:hidden" />
+                <div
+                  onClick={handleSetShowSideBar}
+                  className="hover:cursor-pointer"
+                >
+                  <FaArrowAltCircleRight className="absolute left-4 top-5 text-2xl text-[#5C6BC0] lg:hidden" />
                 </div>
 
                 <div className="flex flex-col items-center justify-center gap-2">
