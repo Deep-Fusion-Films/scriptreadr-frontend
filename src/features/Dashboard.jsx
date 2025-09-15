@@ -19,6 +19,8 @@ import { redirect } from "react-router-dom";
 import { checkAuthToken } from "../util";
 import { useToken } from "../store/AuthContext";
 import { useSubscription } from "../store/SubcriptionContext";
+import { div } from "framer-motion/client";
+import AutoAssignVoicesButton from "./AutoAssignVoicesButton";
 
 export default function Dashboard() {
   const { setToken } = useToken();
@@ -769,11 +771,21 @@ export default function Dashboard() {
                     </p>
                     <div className=" space-y-4 p-4 max-h-75 overflow-y-auto">
                       {!text && (
-                        <p className="text-black lg:absolute lg:top-4/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 text-center">
-                          Speakers and voice selection will appear here once you
-                          upload a file
-                        </p>
+                        <div>
+                          <p className="text-black lg:absolute lg:top-4/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 text-center">
+                            Speakers and voice selection will appear here once
+                            you upload a file
+                          </p>
+                        </div>
                       )}
+
+                      {/* auto assing speaker voicess */}
+                     {text && <AutoAssignVoicesButton
+                        setSpeakerVoices={setSpeakerVoices}
+                        voices={voices}
+                        speakers={speakers}
+                      />}
+
                       {speakers?.map((speaker) => (
                         <div key={speaker} className="flex items-end space-x-4">
                           <div className="flex flex-col">
