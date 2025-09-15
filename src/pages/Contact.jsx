@@ -79,107 +79,109 @@ export default function Contact() {
   };
 
   return (
-    <section className="py-16 px-4 bg-white rounded-xl max-w-4xl mx-auto my-20">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-[#2E3A87] mb-8">Contact Us</h2>
-        {message ? (
-          <h2 className="text-green-500">{message}</h2>
-        ) : error ? (
-          <h2 className="text-red-500">{error}</h2>
-        ) : (
-          ""
-        )}
-      </div>
+    <main>
+      <section className="py-16 px-4 bg-white rounded-xl max-w-4xl mx-auto my-20">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-[#2E3A87] mb-8">Contact Us</h2>
+          {message ? (
+            <h2 className="text-green-500">{message}</h2>
+          ) : error ? (
+            <h2 className="text-red-500">{error}</h2>
+          ) : (
+            ""
+          )}
+        </div>
 
-      <form onSubmit={handleSubmitFormData} className="space-y-6">
-        {/* Full Name and Email - stacked by default, side-by-side only on large screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmitFormData} className="space-y-6">
+          {/* Full Name and Email - stacked by default, side-by-side only on large screens */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullname"
+                name="fullname"
+                value={formData.fullname}
+                onChange={handleFormData}
+                className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2E3A87]"
+                placeholder="Your full name"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleFormData}
+                className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2E3A87]"
+                placeholder="you@example.com"
+              />
+            </div>
+          </div>
+
+          {/* Subject */}
           <div>
             <label
-              htmlFor="fullName"
+              htmlFor="subject"
               className="block text-sm font-medium text-gray-700"
             >
-              Full Name
+              Subject
             </label>
             <input
               type="text"
-              id="fullname"
-              name="fullname"
-              value={formData.fullname}
+              id="subject"
+              name="subject"
+              value={formData.subject}
               onChange={handleFormData}
               className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2E3A87]"
-              placeholder="Your full name"
+              placeholder="Subject"
             />
           </div>
 
+          {/* Message */}
           <div>
             <label
-              htmlFor="email"
+              htmlFor="message"
               className="block text-sm font-medium text-gray-700"
             >
-              Email Address
+              Message
             </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+            <textarea
+              id="message"
+              name="message"
+              rows="6"
+              value={formData.message}
               onChange={handleFormData}
               className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2E3A87]"
-              placeholder="you@example.com"
+              placeholder="Your message..."
             />
           </div>
-        </div>
 
-        {/* Subject */}
-        <div>
-          <label
-            htmlFor="subject"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Subject
-          </label>
-          <input
-            type="text"
-            id="subject"
-            name="subject"
-            value={formData.subject}
-            onChange={handleFormData}
-            className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2E3A87]"
-            placeholder="Subject"
-          />
-        </div>
-
-        {/* Message */}
-        <div>
-          <label
-            htmlFor="message"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            rows="6"
-            value={formData.message}
-            onChange={handleFormData}
-            className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#2E3A87]"
-            placeholder="Your message..."
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            disabled={isSending}
-            className="bg-[#2E3A87] text-white py-2 px-6 rounded hover:bg-[#1f2c6b] transition"
-          >
-            {isSending ? "Sending...": "Send"}
-          </button>
-        </div>
-      </form>
-    </section>
+          {/* Submit Button */}
+          <div>
+            <button
+              type="submit"
+              disabled={isSending}
+              className="bg-[#2E3A87] text-white py-2 px-6 rounded hover:bg-[#1f2c6b] transition"
+            >
+              {isSending ? "Sending..." : "Send"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 }

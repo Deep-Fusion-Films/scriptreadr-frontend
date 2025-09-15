@@ -191,43 +191,44 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <CancelSubscriptionPopUp
-        cancelPopUp={cancelPopUp}
-        setCancelPopUP={setCancelPopUp}
-      />
-      <DeleteAccountPopUp
-        deletePopUp={deletePopUp}
-        setDeletePopUp={setDeletePopUp}
-      />
-      {/* Account Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6 text-left">Account</h1>
+    <main>
+      <div className="min-h-screen bg-gray-50">
+        <CancelSubscriptionPopUp
+          cancelPopUp={cancelPopUp}
+          setCancelPopUP={setCancelPopUp}
+        />
+        <DeleteAccountPopUp
+          deletePopUp={deletePopUp}
+          setDeletePopUp={setDeletePopUp}
+        />
+        {/* Account Content */}
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold mb-6 text-left">Account</h1>
 
-        {/* First Name */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
-          <div>
-            <form action="">
-              <label className="block font-semibold text-gray-700">
-                First Name
-              </label>
+          {/* First Name */}
+          <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
+            <div>
+              <form action="">
+                <label className="block font-semibold text-gray-700">
+                  First Name
+                </label>
 
-              {isEditingFirstName && (
-                <input
-                  type="text"
-                  name="newFirstName"
-                  value={newFirstName}
-                  onChange={handleChangeFirstName}
-                  className="text-gray-900 mt-1 border"
-                />
-              )}
-              {!isEditingFirstName && (
-                <p className="text-gray-900 mt-1">{firstName}</p>
-              )}
-            </form>
-          </div>
+                {isEditingFirstName && (
+                  <input
+                    type="text"
+                    name="newFirstName"
+                    value={newFirstName}
+                    onChange={handleChangeFirstName}
+                    className="text-gray-900 mt-1 border"
+                  />
+                )}
+                {!isEditingFirstName && (
+                  <p className="text-gray-900 mt-1">{firstName}</p>
+                )}
+              </form>
+            </div>
 
-          {/* {!isEditingFirstName && (
+            {/* {!isEditingFirstName && (
             <button
               onClick={handleToggleFirstName}
               className="mt-2 md:mt-0 text-white px-4 py-1 rounded-2xl bg-[#5C6BC0] hover:bg-[#3F4C9A] hover:cursor-pointer"
@@ -236,38 +237,38 @@ export default function UserProfile() {
             </button>
           )} */}
 
-          {isEditingFirstName && (
-            <button
-              disable={isSaving}
-              onClick={handleEditFirstName}
-              className="mt-2 md:mt-0 text-white px-4 py-1 rounded-2xl bg-[#5C6BC0] hover:bg-[#3F4C9A] hover:cursor-pointer"
-            >
-              {isSaving ? "Saving..." : "Save"}
-            </button>
-          )}
-        </div>
-
-        {/* Last Name */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
-          <div>
-            <label className="block font-semibold text-gray-700">
-              Last Name
-            </label>
-
-            {isEditingLastName && (
-              <input
-                type="text"
-                name="newLastName"
-                value={newLastName}
-                onChange={handleChangeLastName}
-                className="text-gray-900 mt-1 border"
-              />
-            )}
-            {!isEditingLastName && (
-              <p className="text-gray-900 mt-1">{lastName}</p>
+            {isEditingFirstName && (
+              <button
+                disable={isSaving}
+                onClick={handleEditFirstName}
+                className="mt-2 md:mt-0 text-white px-4 py-1 rounded-2xl bg-[#5C6BC0] hover:bg-[#3F4C9A] hover:cursor-pointer"
+              >
+                {isSaving ? "Saving..." : "Save"}
+              </button>
             )}
           </div>
-{/* 
+
+          {/* Last Name */}
+          <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
+            <div>
+              <label className="block font-semibold text-gray-700">
+                Last Name
+              </label>
+
+              {isEditingLastName && (
+                <input
+                  type="text"
+                  name="newLastName"
+                  value={newLastName}
+                  onChange={handleChangeLastName}
+                  className="text-gray-900 mt-1 border"
+                />
+              )}
+              {!isEditingLastName && (
+                <p className="text-gray-900 mt-1">{lastName}</p>
+              )}
+            </div>
+            {/* 
           {!isEditingLastName && (
             <button
               onClick={handleToggleLastName}
@@ -286,53 +287,54 @@ export default function UserProfile() {
               {isSaving ? "Save..." : "Save"}
             </button>
           )} */}
-        </div>
-
-        {/* Email */}
-        <div className="mb-6">
-          <label className="block font-semibold text-gray-700">Email</label>
-          <p className="text-gray-900 mt-1">{email}</p>
-        </div>
-
-        {/* Subscription Section */}
-        <div className="mb-6">
-          <label className="flex justify-between font-semibold text-gray-700">
-            Subscription:
-            <span className="text-green-600 font-medium border rounded-2xl px-4 py-1 bg-[#5C6BC0] text-white">
-              {isFetching
-                ? "Fetching plan..."
-                : currentSubscription
-                ? `${currentSubscription.current_plan}`
-                : fetchError || "No subscription found."}
-            </span>
-          </label>
-
-          <div className="mt-4 space-y-2">
-            <button
-              className="text-red-600 hover:underline block"
-              onClick={handleCancelSubscriptionPopUp}
-            >
-              Cancel Subscription
-            </button>
           </div>
-        </div>
 
-        {/* Delete Account */}
-        <div className="border-t pt-6 mt-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between">
-            <button
-              onClick={handleShowDeletePopUp}
-              className="text-red-600 font-semibold hover:underline"
-            >
-              Delete Account
-            </button>
-            <p className="text-sm text-gray-500 mt-2 md:mt-0 md:ml-4">
-              Before deleting your account, make sure to cancel any subscription
-              you have.
-            </p>
+          {/* Email */}
+          <div className="mb-6">
+            <label className="block font-semibold text-gray-700">Email</label>
+            <p className="text-gray-900 mt-1">{email}</p>
+          </div>
+
+          {/* Subscription Section */}
+          <div className="mb-6">
+            <label className="flex justify-between font-semibold text-gray-700">
+              Subscription:
+              <span className="text-green-600 font-medium border rounded-2xl px-4 py-1 bg-[#5C6BC0] text-white">
+                {isFetching
+                  ? "Fetching plan..."
+                  : currentSubscription
+                  ? `${currentSubscription.current_plan}`
+                  : fetchError || "No subscription found."}
+              </span>
+            </label>
+
+            <div className="mt-4 space-y-2">
+              <button
+                className="text-red-600 hover:underline block"
+                onClick={handleCancelSubscriptionPopUp}
+              >
+                Cancel Subscription
+              </button>
+            </div>
+          </div>
+
+          {/* Delete Account */}
+          <div className="border-t pt-6 mt-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between">
+              <button
+                onClick={handleShowDeletePopUp}
+                className="text-red-600 font-semibold hover:underline"
+              >
+                Delete Account
+              </button>
+              <p className="text-sm text-gray-500 mt-2 md:mt-0 md:ml-4">
+                Before deleting your account, make sure to cancel any
+                subscription you have.
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

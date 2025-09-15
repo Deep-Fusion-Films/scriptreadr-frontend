@@ -1,7 +1,7 @@
 import 'cypress-axe';
 import logViolation from "./violationFunction"
 
-describe('Home Page Accessibility', () => {
+describe('about Page Accessibility test', () => {
   it('Has no detectable a11y violations on load', () => {
     cy.visit('http://192.168.1.8:5173/about');
     cy.get('#root', { timeout: 10000 }).should('exist');

@@ -7,7 +7,6 @@ import { FiUpload } from "react-icons/fi";
 import { FaFileCirclePlus } from "react-icons/fa6";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 
-
 import SideBar from "./SideBar";
 import Modal from "./Modal";
 import AudioPlayer from "./AudioPlayer";
@@ -49,7 +48,7 @@ export default function Dashboard() {
   const [audioUrl, setAudioUrl] = useState(null);
 
   //state for showing the sidebar in small screen sizes
-  const [showSideBar, setShowSideBar] = useState(false)
+  const [showSideBar, setShowSideBar] = useState(false);
 
   const [speakers, setSpeakers] = useState([]);
   const [speakerVoices, setSpeakerVoices] = useState({});
@@ -405,8 +404,6 @@ export default function Dashboard() {
     }
 
     try {
-
-
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
         method: "POST",
         headers: {
@@ -637,185 +634,193 @@ export default function Dashboard() {
           // Clean up
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-
         } catch (error) {
           console.error("Error downloading audio:", error);
           setSaving(false);
-          console.log(error.message)
+          console.log(error.message);
           alert("An error occurred while downloading the audio.");
         } finally {
           setSaving(false);
         }
       } else {
         setError("No audio available to download yet.");
-        setShowErrorModal(true)
+        setShowErrorModal(true);
       }
     }
   };
 
   //handle setShowSideBar
   const handleSetShowSideBar = () => {
-    setShowSideBar(true)
-  }
+    setShowSideBar(true);
+  };
 
   return (
     <>
-      <div className="flex flex-col">
-        <ErrorPopUp
-          error={error}
-          setShowErrorModal={setShowErrorModal}
-          showErrorModal={showErrorModal}
-          setHide={setHide}
-        />
+      <main>
+        <div className="flex flex-col">
+          <ErrorPopUp
+            error={error}
+            setShowErrorModal={setShowErrorModal}
+            showErrorModal={showErrorModal}
+            setHide={setHide}
+          />
 
-        <WelcomeScreen
-          showWelcome={showWelcome}
-          setShowWelcome={setShowWelcome}
-          isFormating={isFormating}
-          isLoading={isLoading}
-        />
+          <WelcomeScreen
+            showWelcome={showWelcome}
+            setShowWelcome={setShowWelcome}
+            isFormating={isFormating}
+            isLoading={isLoading}
+          />
 
-        <div className="flex flex-1">
-          <SideBar showSideBar={showSideBar} setShowSideBar={setShowSideBar} />
-
-          {/* Main Content Area */}
-
-          {/*Modal which contains the cancel button  */}
-          {hide && (
-            <Modal
-              progress={progress}
-              setProgress={setProgress}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-              abortController={abortController}
-              setError={setError}
-              setShowErrorModal={setShowErrorModal}
-              setHide={setHide}
+          <div className="flex flex-1">
+            <SideBar
+              showSideBar={showSideBar}
+              setShowSideBar={setShowSideBar}
             />
-          )}
 
-          {hide && (
-            <FormatingScriptModal
-              progress={progress}
-              setProgress={setProgress}
-              isFormating={isFormating}
-              setIsFormating={setIsFormating}
-              abortController={abortController}
-              setError={setError}
-              setShowErrorModal={setShowErrorModal}
-              setHide={setHide}
-            />
-          )}
+            {/* Main Content Area */}
 
-          <main className="flex-1 p-6 bg-white">
-            <div className="flex flex-col lg:flex-row justify-between gap-4">
-              
-              <div
-                placeholder="Type or paste your script here..."
-                className=" relative flex items-center justify-center shadow-sm lg:w-2/3 h-[75vh]  border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                <div onClick={handleSetShowSideBar} className="hover:cursor-pointer">
-                <FaArrowAltCircleRight className="absolute left-4 top-5 text-2xl text-[#5C6BC0] lg:hidden" />
-                </div>
+            {/*Modal which contains the cancel button  */}
+            {hide && (
+              <Modal
+                progress={progress}
+                setProgress={setProgress}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+                abortController={abortController}
+                setError={setError}
+                setShowErrorModal={setShowErrorModal}
+                setHide={setHide}
+              />
+            )}
 
-                <div className="flex flex-col items-center justify-center gap-2">
-                  {/* handle fil change, it's not shown */}
-                  <input
-                    type="file"
-                    accept=".txt,.pdf,.docx" // adjust based on what you want to allow
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
+            {hide && (
+              <FormatingScriptModal
+                progress={progress}
+                setProgress={setProgress}
+                isFormating={isFormating}
+                setIsFormating={setIsFormating}
+                abortController={abortController}
+                setError={setError}
+                setShowErrorModal={setShowErrorModal}
+                setHide={setHide}
+              />
+            )}
 
-                  {/* upload icon */}
-                  <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
-                  <p>upload your scripts, txt, doc, pdf.</p>
-                  <p>Max file Size is 2MB</p>
-
-                  {fileName && <p>{fileName}</p>}
-
-                  <button
-                    onClick={handleClick}
-                    className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
+            <div className="flex-1 p-6 bg-white">
+              <div className="flex flex-col lg:flex-row justify-between gap-4">
+                <div
+                  placeholder="Type or paste your script here..."
+                  className=" relative flex items-center justify-center shadow-sm lg:w-2/3 h-[75vh]  border border-gray-300 p-4 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+                >
+                  <div
+                    onClick={handleSetShowSideBar}
+                    className="hover:cursor-pointer"
                   >
-                    <FiUpload />
-                    Load Script
-                  </button>
-                </div>
-              </div>
+                    <FaArrowAltCircleRight className="absolute left-4 top-5 text-2xl text-[#5C6BC0] lg:hidden" />
+                  </div>
 
-              <div className="relative shadow-sm border border-gray-300 rounded-lg">
-                <p className="bg-[#2E3A87] text-white p-4 rounded-lg">Audio:</p>
-                <div className="flex rounded-lg gap-4 p-4 align-center">
-                  <AudioPlayer audioUrl={audioUrl} />
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    {/* handle fil change, it's not shown */}
+                    <input
+                      type="file"
+                      accept=".txt,.pdf,.docx" // adjust based on what you want to allow
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
 
-                  <button
-                    onClick={() => handleSaveScript("audio")}
-                    className="whitespace-nowrap inline-flex items-center rounded-lg shadow-sm gap-2 py-1 px-3 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
-                  >
-                    <FiSave />
-                    {saving ? "Saving..." : "Save audio"}
-                  </button>
-                </div>
+                    {/* upload icon */}
+                    <FaFileCirclePlus className="text-8xl text-[#5C6BC0]" />
+                    <p>upload your scripts, txt, doc, pdf.</p>
+                    <p>Max file Size is 2MB</p>
 
-                <div className="relative">
-                  <p className="bg-[#2E3A87] rounded-lg text-white p-4">
-                    Speaker List:
-                  </p>
-                  <div className=" space-y-4 p-4 max-h-75 overflow-y-auto">
-                    {!text && (
-                      <p className="text-gray-400 lg:absolute lg:top-4/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 text-center">
-                        Speakers and voice selection will appear here once you
-                        upload a file
-                      </p>
-                    )}
-                    {speakers?.map((speaker) => (
-                      <div key={speaker} className="flex items-end space-x-4">
-                        <div className="flex flex-col">
-                          <p className="font-semibold mb-1">{speaker}</p>
+                    {fileName && <p>{fileName}</p>}
 
-                          <select
-                            className="w-full max-w-xs py-1 px-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
-                            value={speakerVoices[speaker] || ""}
-                            onChange={(e) =>
-                              setSpeakerVoices((prev) => ({
-                                ...prev,
-                                [speaker]: e.target.value,
-                              }))
-                            }
-                          >
-                            <option value="">Select Voice</option>
-                            {voices.map((voice) => (
-                              <option key={voice.id} value={voice.id}>
-                                {voice.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <SpeakerListPreviewButton
-                          speaker={speaker}
-                          speakerVoices={speakerVoices}
-                          setError={setError}
-                          setShowErrorModal={setShowErrorModal}
-                        />
-                      </div>
-                    ))}
+                    <button
+                      onClick={handleClick}
+                      className="flex items-center justify-center gap-2 py-1 px-3  bg-[#5C6BC0] text-white rounded-lg shadow-sm hover:bg-[#3F4C9A] transition"
+                    >
+                      <FiUpload />
+                      Load Script
+                    </button>
                   </div>
                 </div>
-                <div className="flex lg:absolute rounded-lg bottom-0 left-0 border p-2   bg-[#2E3A87] text-white w-full">
-                  <button
-                    onClick={handlePlayScript}
-                    className="flex rounded-lg cursor-pointer border border-[#5C6BC0] items-center gap-2 py-1 px-4 py-2 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
-                  >
-                    Generate Audio
-                  </button>
+
+                <div className="relative shadow-sm border border-gray-300 rounded-lg">
+                  <p className="bg-[#2E3A87] text-white p-4 rounded-lg">
+                    Audio:
+                  </p>
+                  <div className="flex rounded-lg gap-4 p-4 align-center">
+                    <AudioPlayer audioUrl={audioUrl} />
+
+                    <button
+                      onClick={() => handleSaveScript("audio")}
+                      className="whitespace-nowrap inline-flex items-center rounded-lg shadow-sm gap-2 py-1 px-3 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
+                    >
+                      <FiSave />
+                      {saving ? "Saving..." : "Save audio"}
+                    </button>
+                  </div>
+
+                  <div className="relative">
+                    <p className="bg-[#2E3A87] rounded-lg text-white p-4">
+                      Speaker List:
+                    </p>
+                    <div className=" space-y-4 p-4 max-h-75 overflow-y-auto">
+                      {!text && (
+                        <p className="text-black lg:absolute lg:top-4/2 lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:-translate-y-1/2 text-center">
+                          Speakers and voice selection will appear here once you
+                          upload a file
+                        </p>
+                      )}
+                      {speakers?.map((speaker) => (
+                        <div key={speaker} className="flex items-end space-x-4">
+                          <div className="flex flex-col">
+                            <p className="font-semibold mb-1">{speaker}</p>
+
+                            <select
+                              className="w-full max-w-xs py-1 px-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
+                              value={speakerVoices[speaker] || ""}
+                              onChange={(e) =>
+                                setSpeakerVoices((prev) => ({
+                                  ...prev,
+                                  [speaker]: e.target.value,
+                                }))
+                              }
+                            >
+                              <option value="">Select Voice</option>
+                              {voices.map((voice) => (
+                                <option key={voice.id} value={voice.id}>
+                                  {voice.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <SpeakerListPreviewButton
+                            speaker={speaker}
+                            speakerVoices={speakerVoices}
+                            setError={setError}
+                            setShowErrorModal={setShowErrorModal}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex lg:absolute rounded-lg bottom-0 left-0 border p-2   bg-[#2E3A87] text-white w-full">
+                    <button
+                      onClick={handlePlayScript}
+                      className="flex rounded-lg cursor-pointer border border-[#5C6BC0] items-center gap-2 py-1 px-4 py-2 bg-[#5C6BC0] text-white rounded hover:bg-[#3F4C9A] transition"
+                    >
+                      Generate Audio
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         </div>
-      </div>
+      </main>
     </>
   );
 }

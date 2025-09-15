@@ -89,13 +89,13 @@ export default function TestimonialCarousel() {
         <div className="flex justify-center mt-4 space-x-2">
           {listItems.map((_, index) => {
             return (
-              <button
+              <div
                 key={index}
                 onClick={() => setcurrentIndex(index)}
                 className={`h-3 w-3 rounded-full ${
                   currentIndex === index ? "bg-white" : "bg-gray-500"
                 }`}
-              ></button>
+              ></div>
             );
           })}
         </div>

@@ -6,6 +6,7 @@ import LogOutButton from "./LogOutButton";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { RiAccountCircleLine } from "react-icons/ri";
+import logo from "../assets/logo.png";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,16 +30,17 @@ export default function Header() {
 
   return (
     <>
-      <nav className="relative flex flex-row items-center py-4 bg-[#2E3A87] ibm-plex-mono-regular">
+      <nav className="relative flex flex-row items-center  bg-[#2E3A87] ibm-plex-mono-regular">
         {/* logo */}
-        <div className="text-xl  text-white font-bold ml-auto mr-10 lg:ml-10">
-          ScriptReadr
+        <div className="py-2 ml-auto mr-10 lg:ml-10">
+          <img className="h-15 w-auto" src={logo} alt="" />
         </div>
 
         
 
         {/* hamburger menu button only show on sm-md screen sizes */}
         <button
+          aria-label="Open Mobile Menu"
           onClick={handleOpenMenu}
           className="lg:hidden text-white absolute mr-auto ml-10 hover:cursor-pointer"
         >
@@ -160,9 +162,6 @@ export default function Header() {
         </motion.div>
       )}
       </AnimatePresence>
-
-
-    
     </>
   );
 }
