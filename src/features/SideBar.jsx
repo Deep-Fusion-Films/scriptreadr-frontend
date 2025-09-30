@@ -121,7 +121,7 @@ export default function SideBar({
 
   const sideBarContent = (
     <>
-      <div>
+      <div className="overflow-y-auto overflow-x-hidden h-135">
         {showSideBarPopUp && (
           <ConfirmSideBarDeletePopUp
             url={url}
@@ -137,7 +137,7 @@ export default function SideBar({
 
         <ErrorPopUp />
 
-        <nav className=" text-gray-800 font-medium">
+        <nav className="text-gray-800 font-medium">
           <Link
             to="/userprofile"
             className="block hover:text-[#2E3A87] text-[#5C6BC0]"
@@ -148,7 +148,7 @@ export default function SideBar({
           </Link>
 
           {/*subscription  */}
-          <p className="block py-1 text-[#5C6BC0]">Subscription:</p>
+          <p className="block my-4 text-[#5C6BC0]">Subscription:</p>
           <div className="text-sm text-gray-600 ml-2">
             <p>Current Plan:</p>
             <div className="border rounded-lg py-1 text-center text-white bg-[#5C6BC0]">
@@ -212,13 +212,13 @@ export default function SideBar({
               </>
             )}
 
-          <div className="pt-1">
-            <p className="pb-1 text-[#5C6BC0]">Previous Script Audios:</p>
+          <div>
+            <p className="mt-4 text-[#5C6BC0]">Previous Script Audios:</p>
             <div
-              className={`overflow-y-auto overflow-x-hidden h-64 border rounded-lg ${
-                isLoading ? "flex justify-center items-center" : ""
+              className={`${
+                isLoading ? "flex justify-center items-center mt-4" : ""
               } ${
-                sideBarErrorMessage ? "flex justify-center items-center" : ""
+                sideBarErrorMessage ? "flex justify-center items-center mt-4" : ""
               }`}
             >
               {isLoading ? (
@@ -228,7 +228,7 @@ export default function SideBar({
               ) : (
                 audioFiles?.map((audio, index) => {
                   return (
-                    <div className="m-5" key={index}>
+                    <div className="m-4" key={index}>
                       <p>{new Date(audio.uploaded_at).toLocaleString()}</p>
                       <div className="flex gap-4">
                         <p
