@@ -121,7 +121,7 @@ export default function SideBar({
 
   const sideBarContent = (
     <>
-      <div className="overflow-y-auto overflow-x-hidden h-135">
+      <div className="overflow-y-auto overflow-x-hidden h-134">
         {showSideBarPopUp && (
           <ConfirmSideBarDeletePopUp
             url={url}
