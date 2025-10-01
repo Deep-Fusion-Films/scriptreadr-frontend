@@ -36,6 +36,7 @@ export default function SideBar({
   useEffect(() => {
     const fetchAudios = async () => {
       setIsLoading(true);
+      
       setSideBarErrorMessage("")
 
       const token = await checkAuthToken();
