@@ -36,6 +36,7 @@ export default function SideBar({
   useEffect(() => {
     const fetchAudios = async () => {
       setIsLoading(true);
+      setSideBarErrorMessage("")
 
       const token = await checkAuthToken();
       if (!token) {
@@ -63,11 +64,10 @@ export default function SideBar({
         if (!response.ok) {
           setIsLoading(false);
           setSideBarErrorMessage(audio.error || "No audio Files");
-          console.log(audio.error);
           return;
         }
+        setIsLoading(false)
         setAudioFiles(audio.data);
-        setIsLoading(false);
       } catch (err) {
         setIsLoading(false);
         setSideBarErrorMessage("Could not fetch previous audios.");
@@ -215,7 +215,7 @@ export default function SideBar({
           <div>
             <p className="mt-4 text-[#5C6BC0]">Previous Script Audios:</p>
             <div
-              className={`${
+              className={`transition-all duration-500 ease-in-out ${
                 isLoading ? "flex justify-center items-center mt-4" : ""
               } ${
                 sideBarErrorMessage ? "flex justify-center items-center mt-4" : ""

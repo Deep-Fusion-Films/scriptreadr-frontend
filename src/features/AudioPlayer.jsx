@@ -20,7 +20,7 @@ const minTimer = useRef(null);
   };
 
   return (
-    <div className="w-full max-w-full overflow-hidden">
+    <div className="w-full max-w-full overflow-hidden transition-all duration-500 ease-in-out">
       <audio
         className={`max-w-full transition-all duration-500 ease-in-out ${isLoading ? "animate-pulse" : ""}`}
         onLoadStart={handleLoadStart}
