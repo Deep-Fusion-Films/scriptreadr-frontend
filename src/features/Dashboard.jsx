@@ -73,6 +73,7 @@ export default function Dashboard() {
   //this state holds the name of the uploaded file
   const [displayFileName, setDisplayFileName] = useState("");
 
+  //this state holds the name of the audio name
   const [audioName, setAudioName] = useState("");
 
 
@@ -695,9 +696,9 @@ export default function Dashboard() {
             <SideBar
               showSideBar={showSideBar}
               setShowSideBar={setShowSideBar}
-              error={error} 
+              error={error}
               setError={setError}
-              showErrorModal={showErrorModal} 
+              showErrorModal={showErrorModal}
               setShowErrorModal={setShowErrorModal}
               setAudioUrl={setAudioUrl}
               audioUrl={audioUrl}
@@ -782,7 +783,10 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex rounded-lg gap-4 p-4 align-center">
-                    <AudioPlayer audioUrl={audioUrl} />
+                    <AudioPlayer
+    
+                      audioUrl={audioUrl}
+                    />
 
                     <button
                       onClick={() => handleSaveScript("audio")}
