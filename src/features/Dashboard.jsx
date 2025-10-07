@@ -324,6 +324,7 @@ export default function Dashboard() {
           setError(data.error);
         }
 
+        console.log("this is the speaker data", data)
         setDisplayFileName(data.file_name);
         setText(data.content.script);
         setSpeakers(data.content.speakers);
@@ -356,8 +357,10 @@ export default function Dashboard() {
           return;
         }
         setVoices(data);
+       
+        console.log('the data received', data)
       } catch (err) {
-        setError("Could not get script audio");
+        setError("Could not get available voices, please refresh your browser");
         return;
       }
     };
@@ -418,6 +421,10 @@ export default function Dashboard() {
       setShowErrorModal(true);
       return;
     }
+    console.log('display name:', displayFileName)
+    console.log('text:', text)
+    console.log('voice_id:', selectedVoice)
+    console.log('speaker_voices:', speakerVoices)
 
     try {
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
@@ -429,7 +436,7 @@ export default function Dashboard() {
         body: JSON.stringify({
           displayFileName,
           text,
-          voice_id: selectedVoice,
+          //voice_id: selectedVoice,
           speaker_voices: speakerVoices,
         }),
         signal: controller.signal,
@@ -827,7 +834,7 @@ export default function Dashboard() {
                         />
                       )}
 
-                      {speakers?.map((speaker) => (
+                      {speakers?.map(({speaker, gender}) => (
                         <div key={speaker} className="flex items-end space-x-4">
                           <div className="flex flex-col">
                             <p className="font-semibold mb-1">{speaker}</p>
