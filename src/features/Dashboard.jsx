@@ -76,7 +76,6 @@ export default function Dashboard() {
   //this state holds the name of the audio name
   const [audioName, setAudioName] = useState("");
 
-
   //handle upload files
   const fileInputRef = useRef(null);
   const handleClick = () => {
@@ -121,7 +120,10 @@ export default function Dashboard() {
       const status = await subscription.json();
 
       if (!subscription.ok) {
-        setError(status.error);
+        setError(
+          status.error ||
+            "You either don't have an active subscription or you've reached your script upload limit. Please check your plan or renew your subscription."
+        );
         setIsFormating(false);
         setShowErrorModal(true);
         return;
@@ -155,7 +157,10 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setError(
+          data.error ||
+            "Your file could not be processed. Please ensure it is a supported type and size, and try again."
+        );
         setIsFormating(false);
         setShowErrorModal(true);
         return;
@@ -213,7 +218,9 @@ export default function Dashboard() {
         if (!response.ok) {
           clearInterval(intervalId);
           localStorage.removeItem("task_id");
-          setError(data.error);
+          setError(
+            data.error || "Could not start formatting script, please try again"
+          );
           setIsFormating(false);
           setShowErrorModal(true);
           return;
@@ -251,7 +258,10 @@ export default function Dashboard() {
           const info = await res.json();
 
           if (!res.ok) {
-            setError(info.error);
+            setError(
+              info.error ||
+                "Could not complete script formatting, please try again "
+            );
             setIsFormating(false);
             setProgress(0);
             setShowErrorModal(true);
@@ -324,7 +334,7 @@ export default function Dashboard() {
           setError(data.error);
         }
 
-        console.log("this is the speaker data", data)
+        console.log("this is the speaker data", data);
         setDisplayFileName(data.file_name);
         setText(data.content.script);
         setSpeakers(data.content.speakers);
@@ -357,8 +367,8 @@ export default function Dashboard() {
           return;
         }
         setVoices(data);
-       
-        console.log('the data received', data)
+
+        console.log("the data received", data);
       } catch (err) {
         setError("Could not get available voices, please refresh your browser");
         return;
@@ -410,7 +420,10 @@ export default function Dashboard() {
       const status = await subscription.json();
 
       if (!subscription.ok) {
-        setError(status.error);
+        setError(
+          status.error ||
+            "You either don't have an active subscription or you've reached your script upload limit. Please check your plan or renew your subscription."
+        );
         setIsLoading(false);
         setShowErrorModal(true);
         return;
@@ -421,10 +434,10 @@ export default function Dashboard() {
       setShowErrorModal(true);
       return;
     }
-    console.log('display name:', displayFileName)
-    console.log('text:', text)
-    console.log('voice_id:', selectedVoice)
-    console.log('speaker_voices:', speakerVoices)
+    console.log("display name:", displayFileName);
+    console.log("text:", text);
+    console.log("voice_id:", selectedVoice);
+    console.log("speaker_voices:", speakerVoices);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
@@ -445,7 +458,7 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setError(data.error || "Could not start generating audio, please try again");
         setIsLoading(false);
         setShowErrorModal(true);
         setAbortController(null);
@@ -504,7 +517,7 @@ export default function Dashboard() {
         if (!response.ok) {
           clearInterval(intervalid);
           localStorage.removeItem("audio_id");
-          setError(data.error);
+          setError(data.error || "Could not start audio generation, please try again");
           setIsLoading(false);
           setShowErrorModal(true);
           return;
@@ -518,7 +531,7 @@ export default function Dashboard() {
           localStorage.removeItem("audio_id");
           clearInterval(intervalid);
 
-          setError(data.error || "audio generation failed, please try again");
+          setError(data.error || "Audio generation failed, please try again");
           setIsLoading(false);
           setProgress(0);
           setShowErrorModal(true);
@@ -541,7 +554,7 @@ export default function Dashboard() {
 
           const info = await res.json();
           if (!res.ok) {
-            setError(info.error || "audio generation failed, please try again");
+            setError(info.error || "Could not complete generating audio, please try again");
             setIsLoading(false);
             setProgress(0);
             setShowErrorModal(true);
@@ -790,10 +803,7 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex rounded-lg gap-4 p-4 align-center">
-                    <AudioPlayer
-    
-                      audioUrl={audioUrl}
-                    />
+                    <AudioPlayer audioUrl={audioUrl} />
 
                     <button
                       onClick={() => handleSaveScript("audio")}
@@ -834,7 +844,7 @@ export default function Dashboard() {
                         />
                       )}
 
-                      {speakers?.map(({speaker, gender}) => (
+                      {speakers?.map(({ speaker, gender }) => (
                         <div key={speaker} className="flex items-end space-x-4">
                           <div className="flex flex-col">
                             <p className="font-semibold mb-1">{speaker}</p>
