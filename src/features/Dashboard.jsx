@@ -67,6 +67,15 @@ export default function Dashboard() {
   //we use this state to temporarily hide the formatingScriptModal, when canceling the formating fails
   const [hide, setHide] = useState(true);
 
+  //this state triggers the side bar previous audio section to fetch the updated audios
+  const [triggerSideBarFetch, setTriggerSideBarFetch] = useState(false);
+
+  //this state holds the name of the uploaded file
+  const [displayFileName, setDisplayFileName] = useState("");
+
+  //this state holds the name of the audio name
+  const [audioName, setAudioName] = useState("");
+
   //handle upload files
   const fileInputRef = useRef(null);
   const handleClick = () => {
@@ -111,7 +120,10 @@ export default function Dashboard() {
       const status = await subscription.json();
 
       if (!subscription.ok) {
-        setError(status.error);
+        setError(
+          status.error ||
+            "You either don't have an active subscription or you've reached your script upload limit. Please check your plan or renew your subscription."
+        );
         setIsFormating(false);
         setShowErrorModal(true);
         return;
@@ -145,7 +157,10 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setError(
+          data.error ||
+            "Your file could not be processed. Please ensure it is a supported type and size, and try again."
+        );
         setIsFormating(false);
         setShowErrorModal(true);
         return;
@@ -203,7 +218,9 @@ export default function Dashboard() {
         if (!response.ok) {
           clearInterval(intervalId);
           localStorage.removeItem("task_id");
-          setError(data.error);
+          setError(
+            data.error || "Could not start formatting script, please try again"
+          );
           setIsFormating(false);
           setShowErrorModal(true);
           return;
@@ -241,15 +258,20 @@ export default function Dashboard() {
           const info = await res.json();
 
           if (!res.ok) {
-            setError(info.error);
+            setError(
+              info.error ||
+                "Could not complete script formatting, please try again "
+            );
             setIsFormating(false);
             setProgress(0);
             setShowErrorModal(true);
             return;
           }
 
-          setText(info.script);
-          setSpeakers(info.speakers); // update UI
+          console.log(info);
+          setDisplayFileName(info.file_name);
+          setText(info.content.script);
+          setSpeakers(info.content.speakers); // update UI
           setIsFormating(false);
           setProgress(0);
           refetch();
@@ -311,8 +333,11 @@ export default function Dashboard() {
         if (!response.ok) {
           setError(data.error);
         }
-        setText(data.script);
-        setSpeakers(data.speakers);
+
+        console.log("this is the speaker data", data);
+        setDisplayFileName(data.file_name);
+        setText(data.content.script);
+        setSpeakers(data.content.speakers);
       } catch (error) {
         setError("Could not fetch script");
         return;
@@ -342,8 +367,10 @@ export default function Dashboard() {
           return;
         }
         setVoices(data);
+
+        console.log("the data received", data);
       } catch (err) {
-        setError("Could not get script audio");
+        setError("Could not get available voices, please refresh your browser");
         return;
       }
     };
@@ -393,7 +420,10 @@ export default function Dashboard() {
       const status = await subscription.json();
 
       if (!subscription.ok) {
-        setError(status.error);
+        setError(
+          status.error ||
+            "You either don't have an active subscription or you've reached your script upload limit. Please check your plan or renew your subscription."
+        );
         setIsLoading(false);
         setShowErrorModal(true);
         return;
@@ -404,6 +434,10 @@ export default function Dashboard() {
       setShowErrorModal(true);
       return;
     }
+    console.log("display name:", displayFileName);
+    console.log("text:", text);
+    console.log("voice_id:", selectedVoice);
+    console.log("speaker_voices:", speakerVoices);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
@@ -413,8 +447,9 @@ export default function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+          displayFileName,
           text,
-          voice_id: selectedVoice,
+          //voice_id: selectedVoice,
           speaker_voices: speakerVoices,
         }),
         signal: controller.signal,
@@ -423,7 +458,7 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setError(data.error || "Could not start generating audio, please try again");
         setIsLoading(false);
         setShowErrorModal(true);
         setAbortController(null);
@@ -452,7 +487,7 @@ export default function Dashboard() {
     }
   };
 
-  //handle polling logic
+  //handle audio polling logic
   const polling = (audio_id) => {
     const intervalid = setInterval(async () => {
       try {
@@ -482,7 +517,7 @@ export default function Dashboard() {
         if (!response.ok) {
           clearInterval(intervalid);
           localStorage.removeItem("audio_id");
-          setError(data.error);
+          setError(data.error || "Could not start audio generation, please try again");
           setIsLoading(false);
           setShowErrorModal(true);
           return;
@@ -496,7 +531,7 @@ export default function Dashboard() {
           localStorage.removeItem("audio_id");
           clearInterval(intervalid);
 
-          setError(data.error || "audio generation failed, please try again");
+          setError(data.error || "Audio generation failed, please try again");
           setIsLoading(false);
           setProgress(0);
           setShowErrorModal(true);
@@ -519,7 +554,7 @@ export default function Dashboard() {
 
           const info = await res.json();
           if (!res.ok) {
-            setError(info.error || "audio generation failed, please try again");
+            setError(info.error || "Could not complete generating audio, please try again");
             setIsLoading(false);
             setProgress(0);
             setShowErrorModal(true);
@@ -528,8 +563,10 @@ export default function Dashboard() {
 
           const signedUrl = info.audio_url;
 
+          setAudioName(info.audio_name);
           setAudioUrl(signedUrl);
           setIsLoading(false);
+          setTriggerSideBarFetch(!triggerSideBarFetch);
           setProgress(0);
           refetch();
         }
@@ -559,7 +596,7 @@ export default function Dashboard() {
     }, 3000);
   };
 
-  //fetch processed script on mount or continue polling
+  //fetch processed audio on mount or continue polling
   useEffect(() => {
     const fetchAudio = async () => {
       try {
@@ -588,6 +625,7 @@ export default function Dashboard() {
         }
 
         const signedUrl = data.audio_url;
+        setAudioName(data.audio_name);
         setAudioUrl(signedUrl);
       } catch (error) {
         return;
@@ -678,6 +716,15 @@ export default function Dashboard() {
             <SideBar
               showSideBar={showSideBar}
               setShowSideBar={setShowSideBar}
+              error={error}
+              setError={setError}
+              showErrorModal={showErrorModal}
+              setShowErrorModal={setShowErrorModal}
+              setAudioUrl={setAudioUrl}
+              audioUrl={audioUrl}
+              triggerSideBarFetch={triggerSideBarFetch}
+              setAudioName={setAudioName}
+              setHide={setHide}
             />
 
             {/* Main Content Area */}
@@ -750,9 +797,11 @@ export default function Dashboard() {
                 </div>
 
                 <div className="relative shadow-sm border border-gray-300 rounded-lg">
-                  <p className="bg-[#2E3A87] text-white p-4 rounded-lg">
-                    Audio:
-                  </p>
+                  <div className="flex justify-between bg-[#2E3A87] text-white p-4 rounded-lg">
+                    <p>Audio:</p>
+                    <p>{audioName.substring(0, audioName.lastIndexOf("."))}</p>
+                  </div>
+
                   <div className="flex rounded-lg gap-4 p-4 align-center">
                     <AudioPlayer audioUrl={audioUrl} />
 
@@ -766,9 +815,16 @@ export default function Dashboard() {
                   </div>
 
                   <div className="relative">
-                    <p className="bg-[#2E3A87] rounded-lg text-white p-4">
-                      Speaker List:
-                    </p>
+                    <div className="flex justify-between bg-[#2E3A87] rounded-lg text-white p-4">
+                      <p>Speaker List:</p>
+                      <p>
+                        {displayFileName?.substring(
+                          0,
+                          displayFileName.lastIndexOf(".")
+                        )}
+                      </p>
+                    </div>
+
                     <div className=" space-y-4 p-4 max-h-75 overflow-y-auto">
                       {!text && (
                         <div>
@@ -780,13 +836,15 @@ export default function Dashboard() {
                       )}
 
                       {/* auto assing speaker voicess */}
-                     {text && <AutoAssignVoicesButton
-                        setSpeakerVoices={setSpeakerVoices}
-                        voices={voices}
-                        speakers={speakers}
-                      />}
+                      {text && (
+                        <AutoAssignVoicesButton
+                          setSpeakerVoices={setSpeakerVoices}
+                          voices={voices}
+                          speakers={speakers}
+                        />
+                      )}
 
-                      {speakers?.map((speaker) => (
+                      {speakers?.map(({ speaker, gender }) => (
                         <div key={speaker} className="flex items-end space-x-4">
                           <div className="flex flex-col">
                             <p className="font-semibold mb-1">{speaker}</p>

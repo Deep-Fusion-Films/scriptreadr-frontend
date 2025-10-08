@@ -2,7 +2,6 @@ import { FiX } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 export default function ErrorPopUp({ error, showErrorModal, setShowErrorModal, setHide }) {
- 
 
   const handleCloseErrorPopUp = () => {
     setShowErrorModal(false)
@@ -12,7 +11,7 @@ export default function ErrorPopUp({ error, showErrorModal, setShowErrorModal, s
   return (
     <>
       {showErrorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 rounded-md">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 rounded-md">
           <div className=" fadeIn relative bg-white p-6 rounded-3xl shadow-lg text-center w-150 border-3 border-[#2E3A87]">
             {/* Cancel Icon Button */}
             <button
