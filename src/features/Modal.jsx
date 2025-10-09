@@ -28,7 +28,6 @@ export default function Modal({
       setIsLoading(false);
       setShowErrorModal(true);
       localStorage.removeItem("audio_id");
-      console.log("NO id found");
       setIsCancelling(false);
       return;
     }
@@ -53,7 +52,6 @@ export default function Modal({
         );
         setHide(false);
         setShowErrorModal(true);
-        console.error("Error concelling task:", data.detail);
         return;
       }
 
@@ -66,7 +64,6 @@ export default function Modal({
       setIsLoading(false);
       setShowErrorModal(true);
 
-      console.log(data.detail);
     } catch (err) {
       setError("Could not cancel audio generation, please try again");
       setHide(false);

@@ -39,14 +39,11 @@ export const SubscriptionProvider = ({ children }) => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("Fetched Subscription:", data);
         setCurrentSubscription(data);
       } else {
-        console.error(data.detail);
         setFetchError(data.detail);
       }
     } catch (err) {
-      console.error(err.message);
       setFetchError(err.message);
     } finally {
       setIsFetching(false);

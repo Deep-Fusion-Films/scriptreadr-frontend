@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { FiX } from "react-icons/fi";
 import Cookies from "js-cookie";
 import { Link } from "react-router-dom";

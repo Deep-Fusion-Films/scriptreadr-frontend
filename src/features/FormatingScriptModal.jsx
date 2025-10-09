@@ -48,7 +48,6 @@ export default function Modal({
         setError("Could not cancel task, please try again.");
         setHide(false);
         setShowErrorModal(true);
-        console.error("Error concelling task:", data.detail);
         return;
       }
 
@@ -59,12 +58,10 @@ export default function Modal({
       setIsFormating(false);
       setShowErrorModal(true);
 
-      console.log(data.detail);
     } catch (err) {
       setError("Your task could not be cancelled right now, please try again later.");
       setHide(false);
       setShowErrorModal(true);
-      console.log(err);
     } finally {
       setIsCancelling(false);
     }

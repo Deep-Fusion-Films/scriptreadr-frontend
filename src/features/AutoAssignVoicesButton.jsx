@@ -42,18 +42,6 @@ export default function AutoAssignVoicesButton({
   });
 }
 
-  // function handleAutoAssingVoices() {
-  //   setSpeakerVoices(() => {
-  //     const newAssignments = {};
-  //     speakers.forEach(({speaker}, index) => {
-  //       // Assign voices in sequence, if fewer voices leave blank
-  //       const voice = voices[index];
-  //       newAssignments[speaker] = voice?.id || "";
-  //     });
-  //     return newAssignments;
-  //   });
-  // }
-
   return (
     <>
       <button
