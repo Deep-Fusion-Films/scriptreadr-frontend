@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { useToken } from "../store/AuthContext";
 import { checkAuthToken } from "../util";
 import CancelSubscriptionPopUp from "./CancelSubscriptionPopUp";
@@ -52,7 +51,7 @@ export default function UserProfile() {
         console.log(data);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch user info");
+          return
         }
 
         setFirstName(data.first_name);
@@ -60,7 +59,7 @@ export default function UserProfile() {
         setEmail(data.email);
       } catch (err) {
         setError(err.message);
-        console.log(err);
+        return
       }
     };
     fetchUser();
@@ -111,16 +110,15 @@ export default function UserProfile() {
         }
       );
       const data = await response.json();
-      console.log(data);
 
       if (!response.ok) {
-        throw new Error("Failed to fetch user info");
+        return
       }
 
       //setFirstName(data.first_name);
     } catch (err) {
       setError(err.message);
-      console.log(err);
+      return
     } finally {
       setIsSaving(false);
       setIsEditingFirstName(false);
