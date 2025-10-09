@@ -44,7 +44,6 @@ export default function handleCancelSubscriptionPopUp({
     } catch (err) {
       setIsCancelling(false);
       navigate("/subscriptioncancelfailed");
-      console.log(err);
     }
   };
 

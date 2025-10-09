@@ -115,7 +115,6 @@ export default function SideBar({
     } catch (err) {
       setError("Could not load audio, please try again!")
       setShowErrorModal(true)
-      console.log(err);
       return;
     }
   };

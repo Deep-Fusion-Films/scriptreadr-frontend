@@ -1,5 +1,4 @@
 import { FiX } from "react-icons/fi";
-import { Link } from "react-router-dom";
 
 export default function ErrorPopUp({ error, showErrorModal, setShowErrorModal, setHide }) {
 

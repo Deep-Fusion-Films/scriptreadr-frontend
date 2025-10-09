@@ -51,7 +51,6 @@ export default function SpeakerListPreviewButton({
       setError("Could not check your subscription status, please try again.");
       setShowErrorModal(true);
       setIsLoading(false);
-      console.log(err)
       return;
     }
 

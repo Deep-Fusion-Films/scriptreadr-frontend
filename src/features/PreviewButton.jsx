@@ -18,7 +18,8 @@ export default function PreviewButton({ selectedVoice }) {
       });
 
       if (!response.ok) {
-        throw new Error("failed to fetch voice preview");
+        setIsLoading(false)
+        return
       }
 
       const blob = await response.blob();
@@ -26,7 +27,8 @@ export default function PreviewButton({ selectedVoice }) {
       const previewAudio = new Audio(audioUrl);
       previewAudio.play();
     } catch (error) {
-      console.error("Voice preview error:", error);
+      setIsLoading(false)
+      return
     } finally {
       setIsLoading(false);
     }

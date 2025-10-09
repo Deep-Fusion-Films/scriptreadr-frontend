@@ -268,7 +268,6 @@ export default function Dashboard() {
             return;
           }
 
-          console.log(info);
           setDisplayFileName(info.file_name);
           setText(info.content.script);
           setSpeakers(info.content.speakers); // update UI
@@ -278,7 +277,6 @@ export default function Dashboard() {
         }
       } catch (error) {
         if (error.name === "AbortError") {
-          console.log("Upload was cancelled by user during polling");
           clearInterval(intervalId);
           localStorage.removeItem("task_id");
           setError(
@@ -334,7 +332,6 @@ export default function Dashboard() {
           setError(data.error);
         }
 
-        console.log("this is the speaker data", data);
         setDisplayFileName(data.file_name);
         setText(data.content.script);
         setSpeakers(data.content.speakers);
@@ -368,7 +365,6 @@ export default function Dashboard() {
         }
         setVoices(data);
 
-        console.log("the data received", data);
       } catch (err) {
         setError("Could not get available voices, please refresh your browser");
         return;
@@ -434,11 +430,7 @@ export default function Dashboard() {
       setShowErrorModal(true);
       return;
     }
-    console.log("display name:", displayFileName);
-    console.log("text:", text);
-    console.log("voice_id:", selectedVoice);
-    console.log("speaker_voices:", speakerVoices);
-
+   
     try {
       const response = await fetch(`${import.meta.env.VITE_LOCAL}/audio/tts/`, {
         method: "POST",
@@ -688,7 +680,7 @@ export default function Dashboard() {
       }
     }
   };
-
+  
   //handle setShowSideBar
   const handleSetShowSideBar = () => {
     setShowSideBar(true);
