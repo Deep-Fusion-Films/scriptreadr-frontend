@@ -80,9 +80,15 @@ export default function Contact() {
 
   return (
     <main>
-      <section className="py-16 px-4 bg-white rounded-xl max-w-4xl mx-auto my-20">
+      <section className="py-16 px-4 bg-white shadow-2xl rounded-xl max-w-4xl mx-auto my-20">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-[#2E3A87] mb-8">Contact Us</h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-[#2E3A87]">
+              Contact Us
+            </h2>
+            <p>Feedback and suggestions are welcome</p>
+          </div>
+
           {message ? (
             <h2 className="text-green-500">{message}</h2>
           ) : error ? (
