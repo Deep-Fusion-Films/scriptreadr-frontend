@@ -64,7 +64,7 @@ export default function Home() {
             </div>
           </div>
           <h1 className=" text-center font-bold text-xl text-white pt-8 lg:text-2xl">
-            Everything you need in one place.
+            Everything you need in one place
           </h1>
 
           <div className="grid grid-cols-1 pt-8 lg:grid-cols-3 gap-6">
