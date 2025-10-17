@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 import { useToken } from "../store/AuthContext";
 import { SlMenu } from "react-icons/sl";
 import LogOutButton from "./LogOutButton";
@@ -36,8 +37,6 @@ export default function Header() {
           <img className="h-15 w-auto" src={logo} alt="" />
         </div>
 
-        
-
         {/* hamburger menu button only show on sm-md screen sizes */}
         <button
           aria-label="Open Mobile Menu"
@@ -53,10 +52,14 @@ export default function Header() {
             <Link to="/">Home</Link>
           </li>
           <li className="hover:underline decoration-2 decoration-offset-2">
-            <Link to="about">About</Link>
+            <HashLink smooth to="/#about">
+              About
+            </HashLink>
           </li>
           <li className="hover:underline decoration-2 decoration-offset-2">
-            <Link to="pricing">Pricing</Link>
+            <HashLink smooth to="/#pricing">
+              Pricing
+            </HashLink>
           </li>
           <li className="hover:underline decoration-2 decoration-offset-2">
             <Link to="contact">Contact us</Link>
@@ -90,77 +93,82 @@ export default function Header() {
 
       {/* Mobile Navigation */}
       <AnimatePresence>
-      {isOpen && (
-        <motion.div
-        initial={{ y: "-100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "-100%" }}
-        transition={{ duration: 0.3 }}
-         className=" absolute text-white pl-10 border z-10 lg:hidden bg-[#2E3A87] border-[#2E3A87]">
-          <ul>
-            <li
-              onClick={handleOpenMenu}
-              className="hover:underline decoration-2 mb-3 decoration-offset-2"
-            >
-              <Link to="/">Home</Link>
-            </li>
-            <li
-              onClick={handleOpenMenu}
-              className="hover:underline decoration-2 mb-3 decoration-offset-2"
-            >
-              <Link to="about">About</Link>
-            </li>
-            <li
-              onClick={handleOpenMenu}
-              className="hover:underline decoration-2 mb-3 decoration-offset-2"
-            >
-              <Link to="pricing">Pricing</Link>
-            </li>
-            <li
-              onClick={handleOpenMenu}
-              className="hover:underline decoration-2 mb-3 decoration-offset-2"
-            >
-              <Link to="contact">Contact us</Link>
-            </li>
-          </ul>
+        {isOpen && (
+          <motion.div
+            initial={{ y: "-100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.3 }}
+            className=" absolute text-white pl-10 border z-10 lg:hidden bg-[#2E3A87] border-[#2E3A87]"
+          >
+            <ul>
+              <li
+                onClick={handleOpenMenu}
+                className="hover:underline decoration-2 mb-3 decoration-offset-2"
+              >
+                <Link to="/">Home</Link>
+              </li>
+              <li
+                onClick={handleOpenMenu}
+                className="hover:underline decoration-2 mb-3 decoration-offset-2"
+              >
+                <HashLink smooth to="/#about">
+                  About
+                </HashLink>
+              </li>
+              <li
+                onClick={handleOpenMenu}
+                className="hover:underline decoration-2 mb-3 decoration-offset-2"
+              >
+                <HashLink smooth to="/#pricing">
+                  Pricing
+                </HashLink>
+              </li>
+              <li
+                onClick={handleOpenMenu}
+                className="hover:underline decoration-2 mb-3 decoration-offset-2"
+              >
+                <Link to="contact">Contact us</Link>
+              </li>
+            </ul>
 
-          {/* mobile nav buttons */}
-          <div>
-            {token && (
-              <div
-                onClick={handleOpenMenu}
-                className="mr-10 bg-[#5C6BC0] text-white border-[#5C6BC0] py-2 mb-2 px-4 rounded hover:text-[#083B74]"
-              >
-                <Link to="/dashboard">Dashboard</Link>
-              </div>
-            )}
-            {token && (
-              <div
-                onClick={handleOpenMenu}
-                className="mr-10 text-black bg-white py-2 px-4 rounded hover:text-[#083B74] mb-2"
-              >
-                <LogOutButton />
-              </div>
-            )}
-            {!token && (
-              <div
-                onClick={handleOpenMenu}
-                className="mr-10 bg-white text-black py-2 px-4 rounded hover:text-[#083B74] mb-2"
-              >
-                <Link to="/signin">Login</Link>
-              </div>
-            )}
-            {!token && (
-              <div
-                onClick={handleOpenMenu}
-                className="mr-10 bg-[#5C6BC0] text-white border-[#5C6BC0] py-2 mb-2 px-4 rounded hover:text-black"
-              >
-                <Link to="/signup">SignUp</Link>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      )}
+            {/* mobile nav buttons */}
+            <div>
+              {token && (
+                <div
+                  onClick={handleOpenMenu}
+                  className="mr-10 bg-[#5C6BC0] text-white border-[#5C6BC0] py-2 mb-2 px-4 rounded hover:text-[#083B74]"
+                >
+                  <Link to="/dashboard">Dashboard</Link>
+                </div>
+              )}
+              {token && (
+                <div
+                  onClick={handleOpenMenu}
+                  className="mr-10 text-black bg-white py-2 px-4 rounded hover:text-[#083B74] mb-2"
+                >
+                  <LogOutButton />
+                </div>
+              )}
+              {!token && (
+                <div
+                  onClick={handleOpenMenu}
+                  className="mr-10 bg-white text-black py-2 px-4 rounded hover:text-[#083B74] mb-2"
+                >
+                  <Link to="/signin">Login</Link>
+                </div>
+              )}
+              {!token && (
+                <div
+                  onClick={handleOpenMenu}
+                  className="mr-10 bg-[#5C6BC0] text-white border-[#5C6BC0] py-2 mb-2 px-4 rounded hover:text-black"
+                >
+                  <Link to="/signup">SignUp</Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </>
   );
