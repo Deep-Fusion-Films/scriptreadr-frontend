@@ -11,7 +11,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               What is ScriptReadr?
             </h2>
-            <p className="text-white">
+            <p>
               ScriptReadr is an AI-powered tool designed for creatives and
               producers that reads your scripts aloud using natural-sounding
               voice technology. It's a perfect solution for scriptwriters,
@@ -24,7 +24,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               Who can use ScriptReadr?
             </h2>
-            <p className="text-white">
+            <p>
               Anyone working with written scripts or narrative content —
               including screenwriters, producers, directors, educators, and
               content creators — can benefit from ScriptReadr. No technical
@@ -36,7 +36,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               Do I need to install any software?
             </h2>
-            <p className="text-white">
+            <p>
               No installation is needed. ScriptReadr is a fully web-based
               platform accessible through your browser on desktop, tablet, or
               mobile devices.
@@ -47,7 +47,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               How accurate are the AI voices?
             </h2>
-            <p className="text-white">
+            <p>
               ScriptReadr uses advanced AI voice synthesis to deliver
               high-quality, natural speech. While not a substitute for human
               actors, our voices offer clear intonation and pacing that help you
@@ -59,7 +59,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               Is there a free version?
             </h2>
-            <p className="text-white">
+            <p>
               Yes! ScriptReadr offers a free plan with limited features so you
               can test the platform. Premium and Pro plans provide access to
               advanced voice features, longer script lengths, and additional
@@ -71,7 +71,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               Can I export audio from ScriptReadr?
             </h2>
-            <p className="text-white">
+            <p>
               Yes, users on Premium and Pro plans can export their script audio
               in MP3 format for easy sharing or personal review.
             </p>
@@ -81,7 +81,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               How do subscriptions work?
             </h2>
-            <p className="text-white">
+            <p>
               Once you subscribe, your account will be upgraded to your selected
               plan (Basic, Premium, or Pro). Subscription status is stored
               securely in your profile and can be upgraded or cancelled at any
@@ -93,7 +93,7 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               Is my script data private?
             </h2>
-            <p className="text-white">
+            <p>
               Absolutely. ScriptReadr takes privacy seriously. Your scripts are
               never shared with third parties, and we use encrypted storage and
               secure authentication to protect your data. You can read more in
@@ -109,11 +109,11 @@ export default function Faq() {
             <h2 className="text-2xl font-semibold text-[#2E3A87] mb-2">
               Who do I contact for support?
             </h2>
-            <p className="text-white">
+            <p>
               For help, questions, or technical support, you can reach us at{" "}
               <a
                 href="mailto:support@scriptreadr.com"
-                className="text-white underline"
+                className="underline"
               >
                 support@scriptreadr.com
               </a>
