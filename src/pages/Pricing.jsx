@@ -5,20 +5,21 @@ import { checkAuthToken } from "../util";
 import { useNavigate } from "react-router-dom";
 import PricePagePopUp from "../components/PricePagePopUp";
 import RedirectToPaymentPopUp from "../components/RedirectToPaymentPopUp";
+import RedirectToPaymentFailedPopUp from "../components/RedirectToPaymentFailedPopUp";
 
 //icon
 import { IoPricetagsOutline } from "react-icons/io5";
 
-
 export default function Pricing() {
   const [isFree, setIsFree] = useState(false);
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
   const { setToken } = useToken();
   const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
-  //handle starter subscription
+  //handle one_off subscription
   const handleOne_offSubscription = async () => {
     setIsLoadingPayment(true);
 
@@ -26,8 +27,9 @@ export default function Pricing() {
       const token = await checkAuthToken();
       if (!token) {
         setToken(null);
+        setIsLoadingPayment(false);
         navigate("/signin");
-        throw new Error("No valid access token");
+        return;
       }
 
       setToken(token);
@@ -46,18 +48,31 @@ export default function Pricing() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "failed to create stripe session");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Sorry could'nt redirect you to one_off payment page, please try again"
+        );
+        return;
       }
 
       if (!data.sessionId) {
-        throw new Error("No sessionId returned from backend");
+        setIsLoadingPayment(false);
+        setError(
+          "Could'nt redirect you to one_off payment page, please try again"
+        );
+        return;
       }
 
       const stripe = await stripePromise;
       setIsLoadingPayment(false);
       await stripe.redirectToCheckout({ sessionId: data.sessionId });
     } catch (err) {
-      console.log(err);
+      setIsLoadingPayment(false);
+      setError(
+        "failed to redirect you to one_off payment page, please try again"
+      );
+      return;
     }
   };
 
@@ -68,8 +83,9 @@ export default function Pricing() {
     try {
       const token = await checkAuthToken();
       if (!token) {
+        setIsLoadingPayment(false);
         navigate("/signin");
-        throw new Error("No valid access token");
+        return;
       }
       setToken(token);
 
@@ -87,30 +103,45 @@ export default function Pricing() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "failed to create stripe session");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Sorry could'nt redirect you to Starter payment page, please try again"
+        );
+        return;
       }
 
       if (!data.sessionId) {
-        throw new Error("No sessionId returned from backend");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Could'nt redirect you to Starter payment page, please try again"
+        );
+        return;
       }
 
       const stripe = await stripePromise;
       setIsLoadingPayment(false);
       await stripe.redirectToCheckout({ sessionId: data.sessionId });
     } catch (err) {
-      console.log(err);
+      setIsLoadingPayment(false);
+      setError(
+        "Failed to redirect you to Starter payment page, please try again"
+      );
+      return;
     }
   };
 
-  //handle starter subscription
+  //handle pro subscription
   const handleProSubscription = async () => {
     setIsLoadingPayment(true);
 
     try {
       const token = await checkAuthToken();
       if (!token) {
+        setIsLoadingPayment(false);
         navigate("/signin");
-        throw new Error("No valid access token");
+        return;
       }
       setToken(token);
 
@@ -128,30 +159,43 @@ export default function Pricing() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "failed to create stripe session");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Sorry could'nt redirect you to Pro payment page, please try again"
+        );
+        return;
       }
 
       if (!data.sessionId) {
-        throw new Error("No sessionId returned from backend");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Could'nt redirect you to Pro payment page, please try again"
+        );
+        return;
       }
 
       const stripe = await stripePromise;
       setIsLoadingPayment(false);
       await stripe.redirectToCheckout({ sessionId: data.sessionId });
     } catch (err) {
-      console.log(err);
+      setIsLoadingPayment(false);
+      setError("Failed redirect you to Pro payment page, please try again");
+      return;
     }
   };
 
-  //handle starter subscription
+  //handle studio subscription
   const handleStudioSubscription = async () => {
     setIsLoadingPayment(true);
 
     try {
       const token = await checkAuthToken();
       if (!token) {
+        setIsLoadingPayment(false);
         navigate("/signin");
-        throw new Error("No valid access token");
+        return;
       }
       setToken(token);
 
@@ -169,18 +213,30 @@ export default function Pricing() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "failed to create stripe session");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Sorry could'nt redirect you to Studio payment page, please try again"
+        );
+        return;
       }
 
       if (!data.sessionId) {
-        throw new Error("No sessionId returned from backend");
+        setIsLoadingPayment(false);
+        setError(
+          data.error ||
+            "Could'nt redirect you to Studio payment page, please try again"
+        );
+        return;
       }
 
       const stripe = await stripePromise;
       setIsLoadingPayment(false);
       await stripe.redirectToCheckout({ sessionId: data.sessionId });
     } catch (err) {
-      console.log(err);
+      setIsLoadingPayment(false);
+      setError("Failed redirect you to Studio payment page, please try again");
+      return;
     }
   };
 
@@ -197,6 +253,8 @@ export default function Pricing() {
           isLoadingPayment={isLoadingPayment}
           text={"Redirecting you to payment screen, please wait..."}
         />
+
+        <RedirectToPaymentFailedPopUp error={error} setError={setError} />
 
         <div className="flex items-center justify-center">
           <div className="flex items-center justify-center rounded-2xl w-50 py-1 px-3 gap-2">
@@ -241,7 +299,9 @@ export default function Pricing() {
               <h3 className="text-xl font-semibold text-[#2E3A87] mb-2">
                 Starter
               </h3>
-              <p className="text-2xl font-bold mb-4 text-[#F59E0B] ">£99/month</p>
+              <p className="text-2xl font-bold mb-4 text-[#F59E0B] ">
+                £99/month
+              </p>
               <p className="text-sm text-gray-500 font-medium mb-2">
                 What’s included:
               </p>
@@ -262,7 +322,9 @@ export default function Pricing() {
           <div className="border border-[#2E3A87] rounded-xl shadow-md p-6 bg-white flex flex-col justify-between">
             <div>
               <h3 className="text-xl font-semibold text-[#2E3A87] mb-2">Pro</h3>
-              <p className="text-2xl font-bold mb-4 text-[#F59E0B] ">£179/month</p>
+              <p className="text-2xl font-bold mb-4 text-[#F59E0B] ">
+                £179/month
+              </p>
               <p className="text-sm text-gray-500 font-medium mb-2">
                 What’s included:
               </p>
@@ -285,7 +347,9 @@ export default function Pricing() {
               <h3 className="text-xl font-semibold text-[#2E3A87] mb-2">
                 Studio
               </h3>
-              <p className="text-2xl font-bold mb-4 text-[#F59E0B]">£399/month</p>
+              <p className="text-2xl font-bold mb-4 text-[#F59E0B]">
+                £399/month
+              </p>
               <p className="text-sm text-gray-500 font-medium mb-2">
                 What’s included:
               </p>
