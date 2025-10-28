@@ -281,8 +281,10 @@ export default function Pricing() {
                 What’s included:
               </p>
               <ul className="mb-6 space-y-2 text-gray-700 text-sm">
-                <li>1 Single use</li>
-                <li>Scripts: 140 pages max</li>
+                <li>1 Single use:</li>
+                <li>Upload 1 script file</li>
+                <li>Generate 1 script audio</li>
+                <li>Script file size: 2mb max</li>
               </ul>
             </div>
             <button
@@ -306,8 +308,9 @@ export default function Pricing() {
                 What’s included:
               </p>
               <ul className="mb-6 space-y-2 text-gray-700 text-sm">
-                <li>5 scripts</li>
-                <li>Scripts: 140 pages max</li>
+                <li>Upload 5 script files </li>
+                <li>Generate 5 script audios</li>
+                <li>Script file size: 2mb max</li>
               </ul>
             </div>
             <button
@@ -329,8 +332,9 @@ export default function Pricing() {
                 What’s included:
               </p>
               <ul className="mb-6 space-y-2 text-gray-700 text-sm">
-                <li>10 scripts</li>
-                <li>Scripts: 140 pages max</li>
+                <li>Upload 10 script files </li>
+                <li>Generate 10 script audios</li>
+                <li>Script file size: 2mb max</li>
               </ul>
             </div>
             <button
@@ -354,8 +358,9 @@ export default function Pricing() {
                 What’s included:
               </p>
               <ul className="mb-6 space-y-2 text-gray-700 text-sm">
-                <li>25 scripts</li>
-                <li>Scripts: 140 pages max</li>
+                <li>Upload 25 script files</li>
+                <li>Generate 25 script audios</li>
+                <li>Script file size: 2mb max</li>
               </ul>
             </div>
             <button

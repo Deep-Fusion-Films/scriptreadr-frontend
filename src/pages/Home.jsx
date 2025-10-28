@@ -93,7 +93,7 @@ export default function Home() {
               <h2 className="text-lg font-semibold mb-2">Generate Audio</h2>
               <p className="text-sm">
                 Generate audio with assigned voices, sit back and listen as your
-                script come to life.
+                script comes to life.
               </p>
             </div>
           </div>

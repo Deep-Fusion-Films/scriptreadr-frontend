@@ -27,7 +27,7 @@ export default function About() {
             designed for scriptwriters, producers, and content creators who want
             their scripts read out loud with clarity and character. Whether
             you’re developing a screenplay, a podcast, or a narrative for film
-            or TV, ScriptReadr helps you hear your work come to life before
+            or TV, ScriptReadr helps you bring your script to life before
             production even begins.
           </p>
 
@@ -42,8 +42,6 @@ export default function About() {
           <p className="text-lg leading-relaxed text-justify">
             ScriptReadr is trusted by teams and solo creators alike who value
             efficiency, accessibility, and a touch of fun in their workflow.
-            Whether you’re on the free plan or going Pro, the focus remains the
-            same: helping your script sound as brilliant as it reads.
           </p>
           </div>
         </div>
