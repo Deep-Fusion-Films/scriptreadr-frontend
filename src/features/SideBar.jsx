@@ -214,6 +214,7 @@ export default function SideBar({
 
           <div>
             <p className="mt-4 text-[#5C6BC0]">Previous Script Audios:</p>
+            <p className="text-sm">Audios auto-delete in 7 days</p>
             <div
               className={`transition-all duration-500 ease-in-out ${
                 isLoading ? "flex justify-center items-center mt-4" : ""
